@@ -1,6 +1,6 @@
-package velostream.api;
+package velostream;
 
-import velostream.Stream;
+import velostream.infrastructure.Stream;
 import velostream.event.EventIDComparator;
 import velostream.event.EventTimestampComparator;
 import velostream.event.EventUnorderedComparator;

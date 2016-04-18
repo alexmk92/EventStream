@@ -3,7 +3,7 @@
  * Created on 14 October 2006, 10:20
  * Copyright Richard Durley 
  */
-package velostream;
+package velostream.infrastructure;
 
 import velostream.event.*;
 import velostream.infrastructure.EventWorkerExecution;
