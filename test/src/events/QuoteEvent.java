@@ -1,4 +1,4 @@
-
+package events;
 
 import velostream.event.Event;
 import velostream.util.ID;
