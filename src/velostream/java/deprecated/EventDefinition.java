@@ -1,5 +1,8 @@
 package deprecated;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Event Definition that is used to define the meta-data of an Event
  *
@@ -11,8 +14,14 @@ public class EventDefinition {
 
     private final String name;
     private final String description;
+    Map<String, Object> event_fields = new HashMap<>();
+
     private final Field[] fields;
     private final Object[] defaultValues;
+
+    public EventDefinition addField(String name, Object[] defaultValue) {
+        event_fields.put(name, defaultValue);
+    }
 
     public EventDefinition(String name, String description, Field[] fields, Object[] defaultValues) {
         if (name == null || name.equals(""))
@@ -39,6 +48,8 @@ public class EventDefinition {
         this.defaultValues = defaultValues;
         this.description = description;
     }
+
+
 
     public Object[] getDefaultValues() {
         return defaultValues;
