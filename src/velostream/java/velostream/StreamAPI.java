@@ -31,7 +31,7 @@ public class StreamAPI {
      * with worker result ordered by the given order by value (0-timestamp, 1-eventID)
      * optional time to live of events can be specified when timestamp ordering is selected
      *
-     * @return Stream
+     * @return StreamResource
      */
     public static Stream newStream(String name, IEventWorker[] workers, int orderresultsby, int eventTTL) {
         Stream stream;
@@ -68,7 +68,7 @@ public class StreamAPI {
         Stream toreturn = streams.get(streamname);
         if (toreturn != null)
             return toreturn;
-        else throw new StreamNotFoundException("Stream " + streamname + " not found");
+        else throw new StreamNotFoundException("StreamResource " + streamname + " not found");
     }
 
     /**
@@ -86,7 +86,7 @@ public class StreamAPI {
         StreamNotFoundException {
         if (streams.containsKey(streamname)) {
             return streams.get(streamname).put(event, block);
-        } else throw new StreamNotFoundException("Stream " + streamname + " not found");
+        } else throw new StreamNotFoundException("StreamResource " + streamname + " not found");
     }
 
     /**
@@ -102,7 +102,7 @@ public class StreamAPI {
         if (streams.containsKey(streamname)) {
             streams.get(streamname).putAll(events);
             return streams.get(streamname);
-        } else throw new StreamNotFoundException("Stream " + streamname + " not found");
+        } else throw new StreamNotFoundException("StreamResource " + streamname + " not found");
     }
 
     /**

@@ -1,7 +1,6 @@
 
 
 import velostream.event.Event;
-import velostream.util.ID;
 
 /**
  * Created by Admin on 20/09/2014.
@@ -22,7 +21,7 @@ public class AverageQuoteEvent extends Event {
 
     public AverageQuoteEvent(String symbol, double avg_quote)
     {
-        super(ID.next(),System.currentTimeMillis());
+        super();
         this.avg_quote=avg_quote;
         this.symbol=symbol;
     }

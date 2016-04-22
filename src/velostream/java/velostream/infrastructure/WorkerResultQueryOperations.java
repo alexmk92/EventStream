@@ -46,7 +46,7 @@ public class WorkerResultQueryOperations {
      *
      * @return
      */
-    public IEvent[] getContents() {
+    public IEvent[] getAll() {
         List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL)).collect(Collectors.toList());
         return events.toArray(new IEvent[events.size()]);
     }
@@ -56,7 +56,7 @@ public class WorkerResultQueryOperations {
      *
      * @return
      */
-    public IEvent[] getContentsBefore(long eventid) {
+    public IEvent[] getAllBefore(long eventid) {
         IEvent watermarkevent = getEvent(eventid);
         NavigableSet<IEvent> beforeset = querystorecontents.headSet(watermarkevent, false);
         return beforeset.toArray(new IEvent[beforeset.size()]);
@@ -67,7 +67,7 @@ public class WorkerResultQueryOperations {
      *
      * @return IEvents[]
      */
-    public IEvent[] getContentsAfter(long eventid) {
+    public IEvent[] getAllAfter(long eventid) {
         IEvent watermarkevent = getEvent(eventid);
         NavigableSet<IEvent> afterset = querystorecontents.tailSet(watermarkevent, false);
         return afterset.toArray(new IEvent[afterset.size()]);

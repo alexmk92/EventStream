@@ -1,11 +1,11 @@
 package deprecated;
 
-import velostream.Stream;
+import velostream.infrastructure.Stream;
 import velostream.interfaces.IEventWorker;
 
 
 /**
- * Stream Definition that is used to define the meta-data of a Stream
+ * StreamResource Definition that is used to define the meta-data of a StreamResource
  *
  * @author Richard Durley
  *         Date: 10/12/13
@@ -15,7 +15,7 @@ public class StreamDefinition {
 
     private final String name;
     private final String description;
-    private final EventDefinition nuggEventDefinition;
+    private final EventDefinition nuggEventBuilder;
     private final int timestampfieldindex;
     private final int eventsTimeToLiveSeconds;
     private final IEventWorker nuggetProcessor;
@@ -27,23 +27,23 @@ public class StreamDefinition {
     public Stream getNuggetContext()
     {return context;}
 
-    public StreamDefinition(String name, String description, EventDefinition nuggetEventDefinition, int timestampfieldindex, int eventsTimeToLiveSeconds, IEventWorker nuggetProcessor) {
+    public StreamDefinition(String name, String description, EventDefinition nuggetEventBuilder, int timestampfieldindex, int eventsTimeToLiveSeconds, IEventWorker nuggetProcessor) {
         if (name == null || name.equals(""))
             throw new IllegalArgumentException("name is mandatory");
-        if (nuggetEventDefinition==null)
+        if (nuggetEventBuilder ==null)
             throw new IllegalArgumentException("velostream.event definition is mandatory");
 
-        if (timestampfieldindex != -1 || timestampfieldindex >= nuggetEventDefinition.getFields().length)
+        if (timestampfieldindex != -1 || timestampfieldindex >= nuggetEventBuilder.getFields().length)
             throw new IllegalArgumentException("timestamp field must -1 for default timestamp or the field index that is to be used as the timestamp value");
 
-        if (timestampfieldindex != -1 && !(nuggetEventDefinition.getDefaultValues()[timestampfieldindex] instanceof Long))
+        if (timestampfieldindex != -1 && !(nuggetEventBuilder.getDefaultValues()[timestampfieldindex] instanceof Long))
             throw new IllegalArgumentException("timestamp field must be defined as a double");
 
         if (nuggetProcessor == null)
             throw new IllegalArgumentException("NuggetProcessor cannot be null");
 
         this.name = name;
-        this.nuggEventDefinition=nuggetEventDefinition;
+        this.nuggEventBuilder = nuggetEventBuilder;
         this.timestampfieldindex = timestampfieldindex;
         this.description = description;
         this.nuggetProcessor = nuggetProcessor;
@@ -83,14 +83,14 @@ public class StreamDefinition {
         str.append(",timestamp_field_index:");
         str.append(this.timestampfieldindex);
         str.append(",fields:{");
-        for (int i = 0; i < (nuggEventDefinition.getFields().length); i++) {
+        for (int i = 0; i < (nuggEventBuilder.getFields().length); i++) {
             str.append("field:{");
             str.append("name:");
-            str.append(nuggEventDefinition.getFields()[i].getName());
+            str.append(nuggEventBuilder.getFields()[i].getName());
             str.append("type:");
-            str.append(nuggEventDefinition.getDefaultValues()[i].getClass().getSimpleName());
+            str.append(nuggEventBuilder.getDefaultValues()[i].getClass().getSimpleName());
             str.append(",defaultvalue:");
-            str.append(nuggEventDefinition.getDefaultValues()[i]);
+            str.append(nuggEventBuilder.getDefaultValues()[i]);
             str.append("},");
         }
         str.deleteCharAt(str.length() - 1);

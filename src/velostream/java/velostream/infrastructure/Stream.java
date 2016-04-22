@@ -14,12 +14,12 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * A Stream - a stream of information
+ * A StreamResource - a stream of information
  *
- * A Stream is implemented with a Command Query Responsibility Segregation
+ * A StreamResource is implemented with a Command Query Responsibility Segregation
  * External Events can be put into the stream and a segregated (in memory)
  * query store is used to provide a processed (i.e. filtered, aggregated, joined)
- * view of the events for the Stream that are pre-processed via the stream's query
+ * view of the events for the StreamResource that are pre-processed via the stream's query
  * store input processor.  All functions to query the stream should be implemented
  * here.
  *
@@ -47,12 +47,12 @@ public class Stream {
     private Object lock = new Object();
 
     /**
-     * Construct a new Stream with the given velostream.event comparator and velostream.event time to live
+     * Construct a new StreamResource with the given velostream.event comparator and velostream.event time to live
      *
      * Event comparator
-     *      EventTimestampComparator orders Stream worker results in timestamp order
-     *      EventIDComparator orders Stream worker results in velostream.event ID order
-     *      EventUnorderedComparator Stream worker results are not put into order
+     *      EventTimestampComparator orders StreamResource worker results in timestamp order
+     *      EventIDComparator orders StreamResource worker results in velostream.event ID order
+     *      EventUnorderedComparator StreamResource worker results are not put into order
      *
      * Event time to live is to be used with the timestamp comparator for auto removal
      * of events that have lived in the results set for longer than eventTTL seconds

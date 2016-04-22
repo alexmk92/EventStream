@@ -20,17 +20,17 @@
         </plugins>
     </build>
     <dependencies>
-    <dependency>
-        <groupId>io.undertow</groupId>
-        <artifactId>undertow-core</artifactId>
-        <version>1.0.1.Final</version>
-    </dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
+            <version>1.3.21.Final</version>
+        </dependency>
 
-    <dependency>
-        <groupId>io.undertow</groupId>
-        <artifactId>undertow-servlet</artifactId>
-        <version>1.0.1.Final</version>
-    </dependency>
+        <dependency>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-servlet</artifactId>
+            <version>1.3.21.Final</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
@@ -41,9 +41,24 @@
         <dependency>
             <groupId>io.fastjson</groupId>
             <artifactId>boon</artifactId>
-            <version>0.25</version>
+            <version>0.7</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>3.0.16.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-undertow</artifactId>
+            <version>3.0.16.Final</version>
+        </dependency>
+
+
+
     </dependencies>
+
 
 </project>

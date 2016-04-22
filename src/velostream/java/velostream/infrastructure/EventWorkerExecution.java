@@ -1,6 +1,5 @@
 package velostream.infrastructure;
 
-import velostream.Stream;
 import velostream.event.EventUnorderedComparator;
 import velostream.event.PassthroughEventWorker;
 import velostream.event.WatermarkEvent;

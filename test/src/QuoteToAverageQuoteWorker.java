@@ -1,4 +1,5 @@
 
+import events.QuoteEvent;
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;
 

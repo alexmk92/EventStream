@@ -19,9 +19,6 @@ public class EventDefinition {
     private final Field[] fields;
     private final Object[] defaultValues;
 
-    public EventDefinition addField(String name, Object[] defaultValue) {
-        event_fields.put(name, defaultValue);
-    }
 
     public EventDefinition(String name, String description, Field[] fields, Object[] defaultValues) {
         if (name == null || name.equals(""))
