@@ -34,6 +34,14 @@ public abstract class Event implements IEvent {
     this.timestamp = timestamp;
   }
 
+  public void setId(long id) {
+    this.id = id;
+  }
+
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
+
   @Override
   public long getTimestamp() {
     return this.timestamp;
@@ -52,7 +60,6 @@ public abstract class Event implements IEvent {
     return this.id;
   }
 
-
   /**
    * Override to return customer user defined ID for sorting results
    */
@@ -60,6 +67,7 @@ public abstract class Event implements IEvent {
   public String getUserDefinedId() {
     return Long.toString(this.id);
   }
+
 
   @Override
   public boolean equals(Object event) {

@@ -15,10 +15,19 @@ public class StreamResource {
   public static ObjectMapper mapper = ObjectMapperFactory.create();
 
   @GET
-  @Path("/{streamname}")
+  @Path("/{streamname}/{querytype}")
   @Produces("application/json")
-  public String getAll(@PathParam("streamname") String streamname) {
-    return mapper.toJson((StreamAPI.doQuery(streamname, "All", null)));
+  public String getAll(@PathParam("streamname") String streamname,
+      @PathParam("querytype") String querytype) {
+    return mapper.toJson((StreamAPI.doQuery(streamname, querytype, null)));
+  }
+
+  @GET
+  @Path("/{streamname}/{querytype}/{fieldname}")
+  @Produces("application/json")
+  public String getAvg(@PathParam("streamname") String streamname,
+      @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname) {
+    return mapper.toJson((StreamAPI.doQuery(streamname, querytype, fieldname)));
   }
 
   @POST
@@ -27,12 +36,14 @@ public class StreamResource {
   public void postOne(@PathParam("streamname") String streamname, String body) {
     try {
       StreamAPI.getStream(streamname);
-      String eventClassName = "events."+ streamname.substring(0,1).toUpperCase()+ streamname.substring(1)+ "Event";
-      Event eventClass =((Event) Class.forName(eventClassName).newInstance());
-      Event event = mapper.fromJson(body,eventClass.getClass());
+      String eventClassName =
+          "events." + streamname.substring(0, 1).toUpperCase() + streamname.substring(1) + "Event";
+      Event eventClass = ((Event) Class.forName(eventClassName).newInstance());
+      Event event = mapper.fromJson(body, eventClass.getClass());
+      event.setId(eventClass.getId());
+      event.setTimestamp(eventClass.getTimestamp());
       StreamAPI.put(streamname, event, false);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       throw new BadRequestException();
     }
   }

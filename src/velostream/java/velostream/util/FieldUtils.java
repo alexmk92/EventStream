@@ -25,7 +25,7 @@ public class FieldUtils {
         Method f = null;
         Object toreturn = null;
         try {
-            f = event.getClass().getMethod(fieldname,null);
+            f = event.getClass().getMethod("get"+fieldname,null);
             toreturn = f.invoke(event, null);
         } catch (NoSuchMethodException e2) {
         }

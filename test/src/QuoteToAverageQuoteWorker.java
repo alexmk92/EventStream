@@ -26,14 +26,14 @@ public class QuoteToAverageQuoteWorker implements IEventWorker {
     public IEvent work(IEvent toprocess) {
             if (toprocess instanceof QuoteEvent) {
                 QuoteEvent q = (QuoteEvent) toprocess;
-                if (q.symbol.equals(symbol)) {
+                if (q.getSymbol().equals(symbol)) {
                     lock.lock();
                     no_quotes++;
                     if (lastaveragequote !=null) {
-                        lastaveragequote= new AverageQuoteEvent(symbol,(double) ( ((QuoteEvent) toprocess).quote + (lastaveragequote.avg_quote*(no_quotes-1))) / (no_quotes));
+                        lastaveragequote= new AverageQuoteEvent(symbol,(double) ( ((QuoteEvent) toprocess).getQuote() + (lastaveragequote.avg_quote*(no_quotes-1))) / (no_quotes));
                     }
                     else {
-                        lastaveragequote = new AverageQuoteEvent(symbol, (((QuoteEvent) toprocess).quote));
+                        lastaveragequote = new AverageQuoteEvent(symbol, (((QuoteEvent) toprocess).getQuote()));
                     }
                     lock.unlock();
                 }

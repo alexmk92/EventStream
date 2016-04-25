@@ -7,8 +7,8 @@ import velostream.event.Event;
  */
 public class QuoteEvent extends Event {
 
-  public String symbol;
-  public double quote;
+  private String symbol;
+  private double quote;
 
   public QuoteEvent() {
     super();
@@ -19,5 +19,14 @@ public class QuoteEvent extends Event {
     this.symbol = symbol;
     this.quote = quote;
   }
+
+  public String getSymbol() {
+    return symbol;
+  }
+
+  public double getQuote() {
+    return quote;
+  }
+
 
 }
