@@ -1,9 +1,11 @@
 import events.QuoteEvent;
 import org.junit.Test;
 import org.junit.Assert;
+import velostream.deprecated.EventDefinition;
 import velostream.infrastructure.Stream;
 import velostream.StreamAPI;
 import velostream.exceptions.StreamNotFoundException;
+import velostream.deprecated.StreamDefinition;
 import velostream.interfaces.IEventWorker;
 
 import java.util.Random;
@@ -22,14 +24,12 @@ public class TestBenchmarkQuoteStream {
     long benchmarkeventspersecond = 0;
     double avg = 200d;
     int count = 0;
-    int numrecs = 2000000;
+    int numrecs = 5000000;
     Random r = new Random();
     try {
 
-      while (count < 10) {
-        count++;
         Stream quotestream = StreamAPI
-            .newStream("IBM_AVG", new IEventWorker[] {new QuoteToAverageQuoteWorker("IBM")},
+            .newStream("IBM_AVG", new QuoteToAverageQuoteWorker("IBM"),
                 StreamAPI.WORKER_RESULTS_UNORDERED, 0);
         double lastquoteprice = 200d;
         long starttime = System.currentTimeMillis();
@@ -56,7 +56,6 @@ public class TestBenchmarkQuoteStream {
 
         Assert.assertTrue(totest == avg);
 
-      }
       System.out.println("average benchmark per second :" + benchmarkeventspersecond);
     } catch (InterruptedException e) {
 

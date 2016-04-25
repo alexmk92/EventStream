@@ -8,21 +8,30 @@
  */
 package velostream.event;
 
-import org.boon.json.annotations.JsonIgnore;
 import velostream.interfaces.IEvent;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract Event to be extended by user defined Events
  *
  * @author Richard Durley
  */
-public abstract class Event implements IEvent {
+public class Event implements IEvent {
 
   private long id;
   private long timestamp;
+  private Map<String, Object> eventValues;
+
+  public Map<String, Object> getEventValues() {
+    return eventValues;
+  }
+
+  public void setEventValues(Map<String, Object> eventValues) {
+    this.eventValues = eventValues;
+  }
 
   public Event() {
     this.timestamp = System.currentTimeMillis();
@@ -34,12 +43,45 @@ public abstract class Event implements IEvent {
     this.timestamp = timestamp;
   }
 
+  public Event(Map<String, Object> eventValues) {
+    this.timestamp = System.currentTimeMillis();
+    this.id = Counter.INSTANCE.getNext();
+    this.eventValues = eventValues;
+  }
+
+  public Event(long eventid, long timestamp, Map<String, Object> event_values) {
+    this.id = eventid;
+    this.timestamp = timestamp;
+    this.eventValues = event_values;
+  }
+
   public void setId(long id) {
     this.id = id;
   }
 
   public void setTimestamp(long timestamp) {
     this.timestamp = timestamp;
+  }
+
+  public Object getFieldValue(String name) {
+    if (this.eventValues != null) {
+      return eventValues.get(name);
+    } else
+      return getFieldValueViaGetter(name);
+  }
+
+  private Object getFieldValueViaGetter(String fieldname) {
+    Method f = null;
+    Object toreturn = null;
+    try {
+      f = this.getClass().getMethod("get" + fieldname, null);
+      toreturn = f.invoke(this, null);
+    } catch (NoSuchMethodException e2) {
+    } catch (IllegalAccessException e3) {
+    } catch (InvocationTargetException e4) {
+    }
+
+    return toreturn;
   }
 
   @Override

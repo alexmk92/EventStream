@@ -1,5 +1,6 @@
 package velostream.infrastructure;
 
+import com.sun.istack.internal.Nullable;
 import velostream.event.EventUnorderedComparator;
 import velostream.event.PassthroughEventWorker;
 import velostream.event.WatermarkEvent;
@@ -9,7 +10,6 @@ import velostream.util.Execute;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * The velostream.event eventQueryStore where the putAll events are persisted in memory
@@ -20,7 +20,7 @@ public class EventWorkerExecution {
     protected int eventTTL=0;
     private Stream stream = null;
     private boolean isEnd = false;
-    private ArrayList<IEventWorker> workers = new ArrayList<>();
+    private IEventWorker worker;
 
     private WorkerResultQueryOperations workerResultQueryOperations =null;
 
@@ -32,14 +32,11 @@ public class EventWorkerExecution {
      * @param theComparator
      * @param eventTTL
      */
-    public EventWorkerExecution(Stream stream, IEventWorker[] workers, Comparator<IEvent> theComparator , int eventTTL) {
+    public EventWorkerExecution(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
         this.stream = stream;
-        if (workers!=null)
-        for (IEventWorker w:workers) {
-            if (w!=null)
-                this.addWorker(w);
-        }
-        else this.addWorker(new PassthroughEventWorker());
+        if (worker!=null)
+                this.worker=worker;
+        else this.worker=new PassthroughEventWorker();
         this.eventTTL=eventTTL;
 
         Comparator<IEvent> comparator=null;
@@ -59,14 +56,6 @@ public class EventWorkerExecution {
             Execute.getInstance().submit(new ExpiredEventsCollector());
 
         Execute.getInstance().submit(new WorkerInput(this));
-    }
-
-    /**
-     * Add a worker to be executed
-     * @param worker
-     */
-    private void addWorker(IEventWorker worker) {
-        workers.add(worker);
     }
 
     /**
@@ -123,7 +112,7 @@ public class EventWorkerExecution {
      * @param events
      */
     private void work(IEvent[] events) {
-        Arrays.stream(events).forEach(event -> workerresults.addAll(callWorkers(event)));
+        Arrays.stream(events).forEach(event -> workerresults.add(callWorker(event)));
     }
 
     /**
@@ -131,10 +120,8 @@ public class EventWorkerExecution {
      * @param event
      * @return
      */
-    private List<IEvent> callWorkers(IEvent event){
-        List<IEvent> result;
-        result = this.workers.parallelStream().map(e-> e.work(event)).collect(Collectors.toList());
-        return result;
+    private IEvent callWorker(IEvent event){
+        return this.worker.work(event);
     }
 
 

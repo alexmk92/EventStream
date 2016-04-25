@@ -4,10 +4,11 @@ import org.boon.json.ObjectMapper;
 import org.boon.json.ObjectMapperFactory;
 import velostream.StreamAPI;
 import velostream.event.Event;
-import velostream.interfaces.IEvent;
+import velostream.deprecated.StreamDefinition;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("/stream")
 public class StreamResource {
@@ -38,15 +39,33 @@ public class StreamResource {
       StreamAPI.getStream(streamname);
       String eventClassName =
           "events." + streamname.substring(0, 1).toUpperCase() + streamname.substring(1) + "Event";
-      Event eventClass = ((Event) Class.forName(eventClassName).newInstance());
-      Event event = mapper.fromJson(body, eventClass.getClass());
-      event.setId(eventClass.getId());
-      event.setTimestamp(eventClass.getTimestamp());
+      Event event;
+      try {
+        //Map to specific event class
+        Event eventClass = ((Event) Class.forName(eventClassName).newInstance());
+        event = mapper.fromJson(body, eventClass.getClass());
+        event.setId(eventClass.getId());
+        event.setTimestamp(eventClass.getTimestamp());
+      }
+      catch (Exception e) {
+        //Map to key value list
+        Map<String, Object> event_fields = mapper.fromJson(body, Map.class);
+        event = new Event(event_fields);
+      }
+
       StreamAPI.put(streamname, event, false);
     } catch (Exception e) {
       throw new BadRequestException();
     }
   }
 
+
+  @POST
+  @Path("/")
+  @Consumes("application/json")
+  public void create(String body) {
+    StreamDefinition streamDefinition = mapper.fromJson(body, StreamDefinition.class);
+    StreamAPI.newStream(streamDefinition.getName(),null,StreamAPI.WORKER_RESULTS_UNORDERED,0);
+  }
 
 }

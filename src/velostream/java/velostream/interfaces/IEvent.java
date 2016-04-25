@@ -35,6 +35,13 @@ public interface IEvent<T> {
      */
     public String getUserDefinedId();
 
+    /**
+     * Return value of given event field name
+     * @return
+     */
+    public Object getFieldValue(String name);
+
+
 
 }
 

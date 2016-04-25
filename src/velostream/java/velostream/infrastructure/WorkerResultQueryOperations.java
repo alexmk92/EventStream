@@ -1,7 +1,6 @@
 package velostream.infrastructure;
 
 import velostream.interfaces.IEvent;
-import velostream.util.FieldUtils;
 
 import java.util.List;
 import java.util.NavigableSet;
@@ -96,7 +95,7 @@ public class WorkerResultQueryOperations {
      * @return
      */
     public double getAverage(String fieldname) {
-        return this.querystorecontents.stream().parallel().filter(u-> u.isAlive(eventTTL)).mapToDouble(e -> (double) FieldUtils.getFieldValueViaGetter(e, fieldname)).average().getAsDouble();
+        return this.querystorecontents.stream().parallel().filter(u-> u.isAlive(eventTTL)).mapToDouble(e -> (double) e.getFieldValue(fieldname)).average().getAsDouble();
     }
 
 
