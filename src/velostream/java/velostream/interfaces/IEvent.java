@@ -15,7 +15,7 @@ public interface IEvent<T> {
      * Returns an events id
      * @return
      */
-    public long getId();
+    public long getEventID();
 
      /**
      * Returns the velostream.event timestamp

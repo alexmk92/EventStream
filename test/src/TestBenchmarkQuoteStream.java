@@ -1,12 +1,9 @@
 import events.QuoteEvent;
 import org.junit.Test;
 import org.junit.Assert;
-import velostream.deprecated.EventDefinition;
-import velostream.infrastructure.Stream;
+import velostream.stream.Stream;
 import velostream.StreamAPI;
 import velostream.exceptions.StreamNotFoundException;
-import velostream.deprecated.StreamDefinition;
-import velostream.interfaces.IEventWorker;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -24,13 +21,13 @@ public class TestBenchmarkQuoteStream {
     long benchmarkeventspersecond = 0;
     double avg = 200d;
     int count = 0;
-    int numrecs = 5000000;
+    int numrecs = 4000000;
     Random r = new Random();
     try {
 
         Stream quotestream = StreamAPI
             .newStream("IBM_AVG", new QuoteToAverageQuoteWorker("IBM"),
-                StreamAPI.WORKER_RESULTS_UNORDERED, 0);
+                StreamAPI.ORDERBY_UNORDERED, 0);
         double lastquoteprice = 200d;
         long starttime = System.currentTimeMillis();
         for (int i = 1; i < numrecs; i++) {
@@ -44,10 +41,10 @@ public class TestBenchmarkQuoteStream {
 
         }
         quotestream.end();
-        while (!quotestream.isEnd() || !quotestream.getEventEventWorkerExecution().isEnd())
+        while (!quotestream.isEnd() || !quotestream.getEventWorkerExecution().isEnd())
           TimeUnit.MILLISECONDS.sleep(1);
         double totest =
-            ((AverageQuoteEvent) StreamAPI.getStream("IBM_AVG").getEventEventWorkerExecution()
+            ((AverageQuoteEvent) StreamAPI.getStream("IBM_AVG").getEventWorkerExecution()
                 .getWorkerResultQueryOperations().getLast()).avg_quote;
         benchmarkeventspersecond = (benchmarkeventspersecond == 0) ?
             ((numrecs / (System.currentTimeMillis() - starttime)) * 1000) :

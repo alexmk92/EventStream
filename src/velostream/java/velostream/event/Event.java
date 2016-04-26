@@ -11,7 +11,6 @@ package velostream.event;
 import velostream.interfaces.IEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,42 +20,34 @@ import java.util.Map;
  */
 public class Event implements IEvent {
 
-  private long id;
+  private long eventID;
   private long timestamp;
-  private Map<String, Object> eventValues;
-
-  public Map<String, Object> getEventValues() {
-    return eventValues;
-  }
-
-  public void setEventValues(Map<String, Object> eventValues) {
-    this.eventValues = eventValues;
-  }
+  private Map<String, Object> eventKeyValueMAP;
 
   public Event() {
     this.timestamp = System.currentTimeMillis();
-    this.id = Counter.INSTANCE.getNext();
+    this.eventID = Counter.INSTANCE.getNext();
   }
 
   public Event(long eventid, long timestamp) {
-    this.id = eventid;
+    this.eventID = eventid;
     this.timestamp = timestamp;
   }
 
-  public Event(Map<String, Object> eventValues) {
+  public Event(Map<String, Object> eventKeyValueMAP) {
     this.timestamp = System.currentTimeMillis();
-    this.id = Counter.INSTANCE.getNext();
-    this.eventValues = eventValues;
+    this.eventID = Counter.INSTANCE.getNext();
+    this.eventKeyValueMAP = eventKeyValueMAP;
   }
 
-  public Event(long eventid, long timestamp, Map<String, Object> event_values) {
-    this.id = eventid;
+  public Event(long eventid, long timestamp, Map<String, Object> eventKeyValueMap) {
+    this.eventID = eventid;
     this.timestamp = timestamp;
-    this.eventValues = event_values;
+    this.eventKeyValueMAP = eventKeyValueMap;
   }
 
-  public void setId(long id) {
-    this.id = id;
+  public void setEventID(long eventID) {
+    this.eventID = eventID;
   }
 
   public void setTimestamp(long timestamp) {
@@ -64,8 +55,8 @@ public class Event implements IEvent {
   }
 
   public Object getFieldValue(String name) {
-    if (this.eventValues != null) {
-      return eventValues.get(name);
+    if (this.eventKeyValueMAP != null) {
+      return eventKeyValueMAP.get(name);
     } else
       return getFieldValueViaGetter(name);
   }
@@ -84,7 +75,6 @@ public class Event implements IEvent {
     return toreturn;
   }
 
-  @Override
   public long getTimestamp() {
     return this.timestamp;
   }
@@ -97,9 +87,8 @@ public class Event implements IEvent {
       return true;
   }
 
-  @Override
-  public long getId() {
-    return this.id;
+  public long getEventID() {
+    return this.eventID;
   }
 
   /**
@@ -107,7 +96,7 @@ public class Event implements IEvent {
    */
   @Override
   public String getUserDefinedId() {
-    return Long.toString(this.id);
+    return Long.toString(this.eventID);
   }
 
 
@@ -116,7 +105,7 @@ public class Event implements IEvent {
     if (this == event)
       return true;
     else
-      return this.getId() == (((IEvent) event).getId());
+      return this.getEventID() == (((IEvent) event).getEventID());
   }
 
 

@@ -1,4 +1,4 @@
-package velostream.infrastructure;
+package velostream.stream;
 
 import velostream.interfaces.IEvent;
 
@@ -19,12 +19,12 @@ public class WorkerResultQueryOperations {
 
     /**
      * Query Store Constructor
-     * @param eventWorkerExecution
+     * @param workerExecution
      */
-    public WorkerResultQueryOperations(EventWorkerExecution eventWorkerExecution)
+    public WorkerResultQueryOperations(WorkerExecution workerExecution)
     {
-        this.querystorecontents= eventWorkerExecution.workerresults;
-        this.eventTTL= eventWorkerExecution.eventTTL;
+        this.querystorecontents= workerExecution.workerresults;
+        this.eventTTL= workerExecution.eventTTL;
     }
 
     /**
@@ -33,7 +33,7 @@ public class WorkerResultQueryOperations {
      * @return
      */
     public IEvent getEvent(long id) {
-       List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.getId() == id).collect(Collectors.toList());
+       List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.getEventID() == id).collect(Collectors.toList());
         if (events.size()==1)
             return events.get(0);
          else

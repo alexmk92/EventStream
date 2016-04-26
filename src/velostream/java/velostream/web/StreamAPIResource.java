@@ -3,15 +3,16 @@ package velostream.web;
 import org.boon.json.ObjectMapper;
 import org.boon.json.ObjectMapperFactory;
 import velostream.StreamAPI;
+import velostream.stream.StreamDefinition;
 import velostream.event.Event;
-import velostream.deprecated.StreamDefinition;
+import velostream.interfaces.IEventWorker;
 
 import javax.ws.rs.*;
-import java.util.HashMap;
+import javax.ws.rs.core.Response;
 import java.util.Map;
 
 @Path("/stream")
-public class StreamResource {
+public class StreamAPIResource {
 
   public static ObjectMapper mapper = ObjectMapperFactory.create();
 
@@ -34,7 +35,7 @@ public class StreamResource {
   @POST
   @Path("/{streamname}")
   @Consumes("application/json")
-  public void postOne(@PathParam("streamname") String streamname, String body) {
+  public Response postOne(@PathParam("streamname") String streamname, String body) {
     try {
       StreamAPI.getStream(streamname);
       String eventClassName =
@@ -44,7 +45,7 @@ public class StreamResource {
         //Map to specific event class
         Event eventClass = ((Event) Class.forName(eventClassName).newInstance());
         event = mapper.fromJson(body, eventClass.getClass());
-        event.setId(eventClass.getId());
+        event.setEventID(eventClass.getEventID());
         event.setTimestamp(eventClass.getTimestamp());
       }
       catch (Exception e) {
@@ -54,8 +55,9 @@ public class StreamResource {
       }
 
       StreamAPI.put(streamname, event, false);
+      return Response.status(201).build();
     } catch (Exception e) {
-      throw new BadRequestException();
+      throw new BadRequestException(e);
     }
   }
 
@@ -63,9 +65,18 @@ public class StreamResource {
   @POST
   @Path("/")
   @Consumes("application/json")
-  public void create(String body) {
-    StreamDefinition streamDefinition = mapper.fromJson(body, StreamDefinition.class);
-    StreamAPI.newStream(streamDefinition.getName(),null,StreamAPI.WORKER_RESULTS_UNORDERED,0);
+  public Response create(String body) {
+    try {
+      StreamDefinition streamDefinition = mapper.fromJson(body, StreamDefinition.class);
+      StreamAPI.newStream(streamDefinition.getName(),
+          (IEventWorker) Class.forName(streamDefinition.getEventWorker()).newInstance(), streamDefinition.getOrderBy(),
+          streamDefinition.getEventTTLSeconds());
+      return Response.status(201).build();
+    }
+    catch (Exception e) {
+      throw new BadRequestException(e);
+    }
+
   }
 
 }

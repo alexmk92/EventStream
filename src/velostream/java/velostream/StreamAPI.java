@@ -1,6 +1,6 @@
 package velostream;
 
-import velostream.infrastructure.Stream;
+import velostream.stream.Stream;
 import velostream.event.EventIDComparator;
 import velostream.event.EventTimestampComparator;
 import velostream.event.EventUnorderedComparator;
@@ -21,17 +21,18 @@ import java.util.HashMap;
  */
 public class StreamAPI {
 
+  public static final int ORDERBY_UNORDERED = 2;
+  public static final int ORDERBY_TIMESTAMP = 0;
+  public static final int ORDERBY_EVENT_ID = 1;
+  public static final int ORDERBY_EVENT_FIELD = 3;
   private static HashMap<String, Stream> streams = new HashMap<String, Stream>();
-  public static final int WORKER_RESULTS_ORDERED_BY_TIMESTAMP = 0;
-  public static final int WORKER_RESULTS_ORDERED_BY_EVENT_ID = 1;
-  public static final int WORKER_RESULTS_UNORDERED = 2;
 
   /**
    * Create a new stream with given name, array of workers to work events,
    * with worker result ordered by the given order by value (0-timestamp, 1-eventID)
    * optional time to live of events can be specified when timestamp ordering is selected
    *
-   * @return StreamResource
+   * @return StreamAPIResource
    */
   public static Stream newStream(String name, IEventWorker worker, int orderresultsby,
       int eventTTL) {
@@ -70,7 +71,7 @@ public class StreamAPI {
     if (toreturn != null)
       return toreturn;
     else
-      throw new StreamNotFoundException("StreamResource " + streamname + " not found");
+      throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
   }
 
   /**
@@ -89,7 +90,7 @@ public class StreamAPI {
     if (streams.containsKey(streamname)) {
       return streams.get(streamname).put(event, block);
     } else
-      throw new StreamNotFoundException("StreamResource " + streamname + " not found");
+      throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
   }
 
   /**
@@ -106,7 +107,7 @@ public class StreamAPI {
       streams.get(streamname).putAll(events);
       return streams.get(streamname);
     } else
-      throw new StreamNotFoundException("StreamResource " + streamname + " not found");
+      throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
   }
 
   /**
@@ -163,60 +164,60 @@ public class StreamAPI {
           //ALL
           case 0: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }
           //LAST
           case 1: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }
           //FIRST
           case 2: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }
           //ALLAFTER
           case 3: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, long.class);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }
           //ALLBEFORE
           case 4: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, long.class);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }
           //AVERAGE
           case 5: {
             Method queryMethod =
-                stream.getEventEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, String.class);
             toreturn = queryMethod
-                .invoke(stream.getEventEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
                     queryParams);
             break;
           }

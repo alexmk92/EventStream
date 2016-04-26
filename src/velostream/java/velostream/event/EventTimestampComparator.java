@@ -11,12 +11,12 @@ public class EventTimestampComparator implements Comparator<IEvent> {
     @Override
     public int compare(IEvent o1, IEvent o2) {
         if (o1 == o2) return 0;
-        if (o1.getId()== o2.getId()) return 0;
+        if (o1.getEventID()== o2.getEventID()) return 0;
         else if (o1.getTimestamp() > o2.getTimestamp())
             return 1;
         else if (o1.getTimestamp() < o2.getTimestamp()) return -1;
-        else if (o1.getTimestamp() == o2.getTimestamp() && o1.getId()==(o2.getId())) return 0;
-        else if (o1.getId()> o2.getId()) return 1;
+        else if (o1.getTimestamp() == o2.getTimestamp() && o1.getEventID()==(o2.getEventID())) return 0;
+        else if (o1.getEventID()> o2.getEventID()) return 1;
         else return -1;
     }
 }

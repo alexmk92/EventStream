@@ -1,18 +1,20 @@
 import events.QuoteEvent;
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentInfo;
-import org.boon.Boon;
 import org.boon.json.ObjectMapper;
 import org.boon.json.ObjectMapperFactory;
 import org.jboss.resteasy.test.TestPortProvider;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.junit.*;
+
+import static org.hamcrest.core.Is.is;
+
 import velostream.StreamAPI;
+import velostream.stream.StreamDefinition;
 import velostream.event.Event;
 import velostream.event.PassthroughEventWorker;
-import velostream.infrastructure.Stream;
-import velostream.interfaces.IEventWorker;
-import velostream.web.StreamApp;
+import velostream.stream.Stream;
+import velostream.web.StreamAPIApp;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -30,13 +32,12 @@ public class TestWebAPI {
     //given
     Undertow.Builder serverBuilder = Undertow.builder().addHttpListener(8081, "127.0.0.1");
     server = new UndertowJaxrsServer().start(serverBuilder);
-    DeploymentInfo di = server.undertowDeployment(StreamApp.class);
+    DeploymentInfo di = server.undertowDeployment(StreamAPIApp.class);
     di.setContextPath("/");
     di.setDeploymentName("velostream");
     server.deploy(di);
     Stream quotestream = StreamAPI
-        .newStream("quote", new PassthroughEventWorker(),
-            StreamAPI.WORKER_RESULTS_UNORDERED, 0);
+        .newStream("quote", new PassthroughEventWorker(), StreamAPI.ORDERBY_UNORDERED, 0);
     StreamAPI.put("quote", new QuoteEvent("IBM", 2.0d), false);
     StreamAPI.put("quote", new QuoteEvent("IBM", 3.0d), false);
     StreamAPI.put("quote", new QuoteEvent("IBM", 4.0d), false);
@@ -50,50 +51,63 @@ public class TestWebAPI {
 
   @Test
   public void testGetAll() throws Exception {
+
     Client client = ClientBuilder.newClient();
-    String val = client.target(TestPortProvider.generateURL("/velostream/stream/quote/All")).request()
-        .get(String.class);
-    System.out.println(val);
-    client.close();
+    try {
+      String val =
+          client.target(TestPortProvider.generateURL("/velostream/stream/quote/All")).request()
+              .get(String.class);
+      System.out.println(val);
+    } finally {
+      client.close();
+    }
 
   }
 
   @Test
   public void testGetAverage() throws Exception {
     Client client = ClientBuilder.newClient();
-    String val = client.target(TestPortProvider.generateURL("/velostream/stream/quote/Average/Quote")).request()
-        .get(String.class);
-    System.out.println(val);
-    client.close();
+    try {
+      String val =
+          client.target(TestPortProvider.generateURL("/velostream/stream/quote/Average/Quote")).request().get(String.class);
+      System.out.println(val);
+    } finally {
+      client.close();
+    }
 
   }
 
   @Test
   public void postOne() throws Exception {
     Client client = ClientBuilder.newClient();
-    String input = "{\"symbol\":\"IBM\",\"quote\":2.0}";
-    Response response =
-        client.target(TestPortProvider.generateURL("/velostream/stream/quote")).request()
-            .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
-    response.getStatus();
-    client.close();
-
+    try {
+      String input = "{\"symbol\":\"IBM\",\"quote\":2.0}";
+      Response response =
+          client.target(TestPortProvider.generateURL("/velostream/stream/quote")).request()
+              .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
+      response.getStatus();
+    } finally {
+      client.close();
+    }
   }
 
   @Test
   public void post1000() throws Exception {
     Client client = ClientBuilder.newClient();
-    double n = 2.0;
-
-    for (int i = 0; i < 1000; i++) {
-      String input = "{\"symbol\":\"IBM\",\"quote\":" + n + "}";
-      n+=0.1;
-      Response response =
-          client.target(TestPortProvider.generateURL("/velostream/stream/quote")).request()
-              .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
-      response.getStatus();
+    try {
+      double n = 2.0;
+      for (int i = 0; i < 1000; i++) {
+        String input = "{\"symbol\":\"IBM\",\"quote\":" + n + "}";
+        Response response =
+            client.target(TestPortProvider.generateURL("/velostream/stream/quote")).request()
+                .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
+        response.getStatus();
+        n += 2;
+        response.close();
+      }
+    } finally {
+      client.close();
     }
-    client.close();
   }
 
   @Test
@@ -107,22 +121,50 @@ public class TestWebAPI {
     myhash.put("value", 2.0d);
     Event e = new Event(myhash);
     ObjectMapper mapper = ObjectMapperFactory.create();
-    System.out.println(mapper.toJson(myhash));
     Event test = mapper.fromJson(mapper.toJson(myhash), Event.class);
 
-    double n = 2.0;
-
-    for (int i = 0; i < 1000; i++) {
-      //String input = "[{\"symbol\":\"IBM\"},{\"quote\":" + n + "}]";
-      String input = "{\"symbol\":\"IBM\",\"quote\":" + n +"}";
-      n+=0.1;
-      Response response =
-          client.target(TestPortProvider.generateURL("/velostream/stream/quotenew")).request()
-              .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
-      response.getStatus();
+    try {
+      double n = 2.0;
+      for (int i = 0; i < 1000; i++) {
+        String input = "{\"symbol\":\"IBM\",\"quote\":" + n + "}";
+        n += 0.1;
+        Response response =
+            client.target(TestPortProvider.generateURL("/velostream/stream/quotenew")).request()
+                .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
+        response.getStatus();
+        response.close();
+      }
+    } finally {
+      client.close();
     }
-    client.close();
   }
+
+  @Test
+  public void testCreateStream() throws Exception {
+    //given
+    StreamDefinition sd =
+        new StreamDefinition("newstream", null, null, 0, StreamAPI.ORDERBY_UNORDERED, null,
+            null);
+    ObjectMapper mapper = ObjectMapperFactory.create();
+    String input = mapper.toJson(sd);
+    System.out.println(input);
+    Client client = ClientBuilder.newClient();
+
+    try {
+      //when
+      Response response =
+          client.target(TestPortProvider.generateURL("/velostream/stream")).request()
+              .post(Entity.entity(input, MediaType.APPLICATION_JSON_TYPE));
+      //then
+      Assert.assertThat(response.getStatus(), is(201));
+      Assert.assertNotNull(StreamAPI.getStream("newstream"));
+    } finally {
+      client.close();
+    }
+
+
+  }
+
 
 
   @AfterClass

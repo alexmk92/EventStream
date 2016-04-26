@@ -3,9 +3,8 @@
  * Created on 14 October 2006, 10:20
  * Copyright Richard Durley 
  */
-package velostream.infrastructure;
+package velostream.stream;
 
-import velostream.deprecated.StreamDefinition;
 import velostream.event.*;
 import velostream.interfaces.*;
 
@@ -14,12 +13,12 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * A StreamResource - a stream of information
+ * A StreamAPIResource - a stream of information
  * <p>
- * A StreamResource is implemented with a Command Query Responsibility Segregation
+ * A StreamAPIResource is implemented with a Command Query Responsibility Segregation
  * External Events can be put into the stream and a segregated (in memory)
  * query store is used to provide a processed (i.e. filtered, aggregated, joined)
- * view of the events for the StreamResource that are pre-processed via the stream's query
+ * view of the events for the StreamAPIResource that are pre-processed via the stream's query
  * store input processor.  All functions to query the stream should be implemented
  * here.
  *
@@ -29,7 +28,7 @@ import java.util.concurrent.locks.LockSupport;
 public class Stream {
 
   //stream variables
-  private final EventWorkerExecution eventEventWorkerExecution;
+  private final WorkerExecution eventWorkerExecution;
 
   private StreamDefinition streamDefinition;
 
@@ -38,7 +37,9 @@ public class Stream {
   private final int queue_max_size = 1024 * Runtime.getRuntime().availableProcessors();
   private int eventTTL;
   private IEventWorker eventProcessor;
+
   private String streamName;
+
   //stream state
   private BlockingQueue<IEvent> event_queue;
   private IEvent[] eventqueue_out;
@@ -48,14 +49,13 @@ public class Stream {
   private volatile boolean flush = false;
   //locks
   private Object lock = new Object();
-
   /**
-   * Construct a new StreamResource with the given velostream.event comparator and velostream.event time to live
+   * Construct a new StreamAPIResource with the given velostream.event comparator and velostream.event time to live
    * <p>
    * Event comparator
-   * EventTimestampComparator orders StreamResource worker results in timestamp order
-   * EventIDComparator orders StreamResource worker results in velostream.event ID order
-   * EventUnorderedComparator StreamResource worker results are not put into order
+   * EventTimestampComparator orders StreamAPIResource worker results in timestamp order
+   * EventIDComparator orders StreamAPIResource worker results in velostream.event ID order
+   * EventUnorderedComparator StreamAPIResource worker results are not put into order
    * <p>
    * Event time to live is to be used with the timestamp comparator for auto removal
    * of events that have lived in the results set for longer than eventTTL seconds
@@ -71,7 +71,15 @@ public class Stream {
     this.eventqueue_out = new IEvent[this.queue_max_size];
     this.streamName = streamName;
     this.eventTTL = eventTTL;
-    this.eventEventWorkerExecution = new EventWorkerExecution(this, worker, comparator, eventTTL);
+    this.eventWorkerExecution = new WorkerExecution(this, worker, comparator, eventTTL);
+  }
+
+  /**
+   * The streams name
+   * @return
+   */
+  public String getStreamName() {
+    return streamName;
   }
 
 
@@ -97,8 +105,8 @@ public class Stream {
    *
    * @return
    */
-  public EventWorkerExecution getEventEventWorkerExecution() {
-    return eventEventWorkerExecution;
+  public WorkerExecution getEventWorkerExecution() {
+    return eventWorkerExecution;
   }
 
 

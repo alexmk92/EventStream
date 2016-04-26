@@ -1,4 +1,4 @@
-package velostream.infrastructure;
+package velostream.stream;
 
 import com.sun.istack.internal.Nullable;
 import velostream.event.EventUnorderedComparator;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The velostream.event eventQueryStore where the putAll events are persisted in memory
  */
-public class EventWorkerExecution {
+public class WorkerExecution {
 
     protected ConcurrentSkipListSet<IEvent> workerresults;
     protected int eventTTL=0;
@@ -32,7 +32,7 @@ public class EventWorkerExecution {
      * @param theComparator
      * @param eventTTL
      */
-    public EventWorkerExecution(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
+    public WorkerExecution(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
         this.stream = stream;
         if (worker!=null)
                 this.worker=worker;
@@ -87,18 +87,18 @@ public class EventWorkerExecution {
      */
     private class WorkerInput implements Runnable {
 
-        EventWorkerExecution eventWorkerExecution;
+        WorkerExecution workerExecution;
 
-        public WorkerInput(EventWorkerExecution eventWorkerExecution) {
-            this.eventWorkerExecution = eventWorkerExecution;
+        public WorkerInput(WorkerExecution workerExecution) {
+            this.workerExecution = workerExecution;
         }
 
         @Override
         public void run() {
             try {
                 while (!stream.isEnd())
-                    this.eventWorkerExecution.work(stream.getAll());
-                this.eventWorkerExecution.work(stream.getAll());
+                    this.workerExecution.work(stream.getAll());
+                this.workerExecution.work(stream.getAll());
                 isEnd=true;
             } catch (Exception e) {
                 e.printStackTrace();
