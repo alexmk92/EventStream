@@ -8,6 +8,7 @@ import velostream.event.Event;
 import velostream.interfaces.IEventWorker;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
@@ -65,12 +66,9 @@ public class StreamAPIResource {
   @POST
   @Path("/")
   @Consumes("application/json")
-  public Response create(String body) {
+  public Response create(StreamDefinition streamDefinition) {
     try {
-      StreamDefinition streamDefinition = mapper.fromJson(body, StreamDefinition.class);
-      StreamAPI.newStream(streamDefinition.getName(),
-          (IEventWorker) Class.forName(streamDefinition.getEventWorker()).newInstance(), streamDefinition.getOrderBy(),
-          streamDefinition.getEventTTLSeconds());
+      StreamAPI.newStream(streamDefinition);
       return Response.status(201).build();
     }
     catch (Exception e) {

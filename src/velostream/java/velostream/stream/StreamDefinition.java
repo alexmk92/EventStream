@@ -1,6 +1,11 @@
 package velostream.stream;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.internal.Nullable;
+import velostream.event.PassthroughEventWorker;
+import velostream.interfaces.IEventWorker;
+
+import java.util.Map;
 
 
 /**
@@ -12,17 +17,23 @@ import com.sun.istack.internal.Nullable;
  */
 public class StreamDefinition {
 
-  private final String name;
-  private final String description;
-  private final String timestampfieldname;
-  private final int eventTTLSeconds;
-  private final int orderBy;
-  private final String orderbyField;
-  private final String eventWorker;
+  private String name;
+  private String description;
+  private String timestampfieldname;
+  private int eventTTLSeconds;
+  private int orderBy;
+  private String orderbyField;
+  private String eventWorkerName;
+  private Map<String, Object> workerParams;
+
+  public StreamDefinition() {
+    super();
+  }
 
   public StreamDefinition(String name, @Nullable String description,
       @Nullable String timestampfieldname, int eventsTTLSeconds, int orderBy,
-      @Nullable String orderbyField, @Nullable String eventWorker) throws Exception {
+      @Nullable String orderbyField, @Nullable String eventWorker,
+      Map<String, Object> workerParams) {
     if (name == null || name.equals(""))
       throw new IllegalArgumentException("name is mandatory");
     if (eventsTTLSeconds < 0)
@@ -34,9 +45,10 @@ public class StreamDefinition {
     if (orderBy < 0 || orderBy > 3)
       throw new IllegalArgumentException("incorrect orderby value");
     if (eventWorker == null)
-      this.eventWorker = "velostream.event.PassthroughEventWorker";
+      this.eventWorkerName = "velostream.event.PassthroughEventWorker";
     else
-      this.eventWorker = Class.forName(eventWorker).newInstance().getClass().getSimpleName();
+      this.eventWorkerName = eventWorker;
+
 
     this.orderbyField = orderbyField;
     this.orderBy = orderBy;
@@ -44,11 +56,11 @@ public class StreamDefinition {
     this.timestampfieldname = timestampfieldname;
     this.description = description;
     this.eventTTLSeconds = eventsTTLSeconds;
+    this.workerParams = workerParams;
   }
 
   public String getName() {
     return this.name;
-
   }
 
   public int getOrderBy() {
@@ -71,8 +83,22 @@ public class StreamDefinition {
     return orderbyField;
   }
 
-  public String getEventWorker() {
-    return eventWorker;
+  public String getEventWorkerName() {
+    return eventWorkerName;
+  }
+
+  public Map<String, Object> getWorkerParams() {
+    return workerParams;
+  }
+
+  @JsonIgnore
+  public IEventWorker getEventWorker() {
+    try {
+      return (IEventWorker) Class.forName(this.eventWorkerName).newInstance();
+    } catch (Exception e) {
+      return new PassthroughEventWorker();
+    }
+
   }
 
   @Override

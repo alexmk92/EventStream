@@ -1,6 +1,8 @@
 package velostream.interfaces;
 
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Admin
@@ -9,5 +11,5 @@ package velostream.interfaces;
  * To change this template use File | Settings | File Templates.
  */
 public interface IEventWorker {
-    public IEvent work(IEvent toprocess);
+    public IEvent work(IEvent toprocess, Map<String, Object> params);
 }

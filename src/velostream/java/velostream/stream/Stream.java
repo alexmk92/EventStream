@@ -38,11 +38,14 @@ public class Stream {
   private int eventTTL;
   private IEventWorker eventProcessor;
 
+  private Map<String, Object> workerParams;
+
   private String streamName;
 
+  private IEvent[] eventqueue_out;
   //stream state
   private BlockingQueue<IEvent> event_queue;
-  private IEvent[] eventqueue_out;
+
   private int last_queue_size = 0;
   private volatile boolean isEnd = false;
   private Thread parked = null;
@@ -65,15 +68,15 @@ public class Stream {
    * @param comparator
    * @param eventTTL
    */
-  public Stream(String streamName, IEventWorker worker, Comparator<IEvent> comparator,
+  public Stream(String streamName, IEventWorker worker, Map<String, Object> workerParams, Comparator<IEvent> comparator,
       int eventTTL) {
     this.event_queue = new LinkedBlockingQueue<IEvent>(queue_max_size);
     this.eventqueue_out = new IEvent[this.queue_max_size];
     this.streamName = streamName;
     this.eventTTL = eventTTL;
     this.eventWorkerExecution = new WorkerExecution(this, worker, comparator, eventTTL);
+    this.workerParams=workerParams;
   }
-
   /**
    * The streams name
    * @return
@@ -82,13 +85,13 @@ public class Stream {
     return streamName;
   }
 
-
   /**
    * End the life of this stream :(
    */
   public void end() {
     this.isEnd = true;
   }
+
 
   /**
    * Returns if the stream has been ended
@@ -109,7 +112,6 @@ public class Stream {
     return eventWorkerExecution;
   }
 
-
   /**
    * Puts an array of events into the stream
    *
@@ -119,6 +121,7 @@ public class Stream {
     if (events != null && !isEnd)
       Arrays.stream(events).parallel().forEach(e -> put(e, true));
   }
+
 
   /**
    * Put a single velostream.event into the stream
@@ -135,7 +138,6 @@ public class Stream {
     return put_ok;
   }
 
-
   private boolean doPut(IEvent event) {
     boolean put_ok = true;
     try {
@@ -146,6 +148,7 @@ public class Stream {
     }
     return put_ok;
   }
+
 
   private boolean addToStream(IEvent event) throws InterruptedException {
     boolean put_ok;
@@ -159,7 +162,6 @@ public class Stream {
     }
     return put_ok;
   }
-
 
   private int size() {
     return event_queue.size() - last_queue_size;
@@ -181,6 +183,7 @@ public class Stream {
     flush = false;
   }
 
+
   public IEvent[] getAll() {
     IEvent[] result;
 
@@ -196,6 +199,10 @@ public class Stream {
     }
 
     return result;
+  }
+
+  public Map<String, Object> getWorkerParams() {
+    return workerParams;
   }
 
   private int getNumberOfNewEvents(int mmsize, int lastsize) {

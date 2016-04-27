@@ -11,7 +11,7 @@ The StreamAPI class provides all methods required to build and query a stream.
 
 To run the benchmark run the test class
 
-TestBenchmarkQuoteStream 
+TestQuoteStream
 
 With suggested Java parameters -ea  -Xrs -Xss12m -Xms150m -Xmx500m
 

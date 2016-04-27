@@ -6,7 +6,7 @@ import velostream.event.EventTimestampComparator;
 import velostream.event.EventUnorderedComparator;
 import velostream.exceptions.StreamNotFoundException;
 import velostream.interfaces.IEvent;
-import velostream.interfaces.IEventWorker;
+import velostream.stream.StreamDefinition;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,28 +34,31 @@ public class StreamAPI {
    *
    * @return StreamAPIResource
    */
-  public static Stream newStream(String name, IEventWorker worker, int orderresultsby,
-      int eventTTL) {
+  public static Stream newStream(StreamDefinition streamDefinition) {
     Stream stream;
-    switch (orderresultsby) {
+    switch (streamDefinition.getOrderBy()) {
       case 0: {
-        stream = new Stream(name, worker, new EventTimestampComparator(), eventTTL);
+        stream = new Stream(streamDefinition.getName(), streamDefinition.getEventWorker(), streamDefinition.getWorkerParams(),
+            new EventTimestampComparator(), streamDefinition.getEventTTLSeconds());
         break;
       }
       case 1: {
-        stream = new Stream(name, worker, new EventIDComparator(), 0);
+        stream = new Stream(streamDefinition.getName(), streamDefinition.getEventWorker(), streamDefinition.getWorkerParams(),
+            new EventIDComparator(), 0);
         break;
       }
       case 2: {
-        stream = new Stream(name, worker, new EventUnorderedComparator(), 0);
+        stream = new Stream(streamDefinition.getName(), streamDefinition.getEventWorker(),streamDefinition.getWorkerParams(),
+            new EventUnorderedComparator(), 0);
         break;
       }
 
       default: {
-        stream = new Stream(name, worker, new EventIDComparator(), 0);
+        stream = new Stream(streamDefinition.getName(), streamDefinition.getEventWorker(),streamDefinition.getWorkerParams(),
+            new EventIDComparator(), 0);
       }
     }
-    streams.put(name, stream);
+    streams.put(streamDefinition.getName(), stream);
     return stream;
   }
 

@@ -8,6 +8,7 @@
  */
 package velostream.event;
 
+import org.boon.json.annotations.JsonIgnore;
 import velostream.interfaces.IEvent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

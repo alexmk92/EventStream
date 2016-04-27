@@ -112,7 +112,7 @@ public class WorkerExecution {
      * @param events
      */
     private void work(IEvent[] events) {
-        Arrays.stream(events).forEach(event -> workerresults.add(callWorker(event)));
+        Arrays.stream(events).forEach(event -> workerresults.add(callWorker(event, stream.getWorkerParams())));
     }
 
     /**
@@ -120,8 +120,8 @@ public class WorkerExecution {
      * @param event
      * @return
      */
-    private IEvent callWorker(IEvent event){
-        return this.worker.work(event);
+    private IEvent callWorker(IEvent event, Map<String, Object> workerParams){
+        return this.worker.work(event, workerParams);
     }
 
 
@@ -134,7 +134,7 @@ public class WorkerExecution {
         public void run() {
             while (!stream.isEnd()) {
                 try {
-                    removeExpiredEventsWhenLimitReached(100000);
+                    removeExpiredEventsWhenLimitReached(10000);
                     TimeUnit.MILLISECONDS.sleep(100);
                 } catch (InterruptedException e) {
                 }
