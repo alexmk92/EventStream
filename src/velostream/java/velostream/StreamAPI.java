@@ -21,10 +21,6 @@ import java.util.HashMap;
  */
 public class StreamAPI {
 
-  public static final int ORDERBY_UNORDERED = 2;
-  public static final int ORDERBY_TIMESTAMP = 0;
-  public static final int ORDERBY_EVENT_ID = 1;
-  public static final int ORDERBY_EVENT_FIELD = 3;
   private static HashMap<String, Stream> streams = new HashMap<String, Stream>();
 
   /**
@@ -167,60 +163,60 @@ public class StreamAPI {
           //ALL
           case 0: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }
           //LAST
           case 1: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }
           //FIRST
           case 2: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, null);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }
           //ALLAFTER
           case 3: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, long.class);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }
           //ALLBEFORE
           case 4: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, long.class);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }
           //AVERAGE
           case 5: {
             Method queryMethod =
-                stream.getEventWorkerExecution().getWorkerResultQueryOperations().getClass()
+                stream.getEventQueryStore().getQueryOperations().getClass()
                     .getDeclaredMethod("get" + queryType, String.class);
             toreturn = queryMethod
-                .invoke(stream.getEventWorkerExecution().getWorkerResultQueryOperations(),
+                .invoke(stream.getEventQueryStore().getQueryOperations(),
                     queryParams);
             break;
           }

@@ -8,10 +8,11 @@
  */
 package velostream.event;
 
-import org.boon.json.annotations.JsonIgnore;
 import velostream.interfaces.IEvent;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,30 +22,32 @@ import java.util.Map;
  */
 public class Event implements IEvent {
 
+  private String eventName;
   private long eventID;
   private long timestamp;
-  private Map<String, Object> eventKeyValueMAP;
+  private Map<String, Object> eventFieldValues;
 
   public Event() {
+    super();
+  }
+
+  public Event(String eventName) {
+    this.eventName = eventName;
     this.timestamp = System.currentTimeMillis();
     this.eventID = Counter.INSTANCE.getNext();
+    this.eventFieldValues = new HashMap<>();
   }
 
   public Event(long eventid, long timestamp) {
     this.eventID = eventid;
     this.timestamp = timestamp;
-  }
-
-  public Event(Map<String, Object> eventKeyValueMAP) {
-    this.timestamp = System.currentTimeMillis();
-    this.eventID = Counter.INSTANCE.getNext();
-    this.eventKeyValueMAP = eventKeyValueMAP;
+    this.eventFieldValues = new HashMap<>();
   }
 
   public Event(long eventid, long timestamp, Map<String, Object> eventKeyValueMap) {
     this.eventID = eventid;
     this.timestamp = timestamp;
-    this.eventKeyValueMAP = eventKeyValueMap;
+    this.eventFieldValues = eventKeyValueMap;
   }
 
   public void setEventID(long eventID) {
@@ -55,9 +58,14 @@ public class Event implements IEvent {
     this.timestamp = timestamp;
   }
 
+  public void addFieldValue(String fieldname, Object value) {
+    this.eventFieldValues.put(fieldname, value);
+  }
+
   public Object getFieldValue(String name) {
-    if (this.eventKeyValueMAP != null) {
-      return eventKeyValueMAP.get(name);
+
+    if (this.eventFieldValues != null) {
+      return eventFieldValues.get(name);
     } else
       return getFieldValueViaGetter(name);
   }
@@ -80,7 +88,14 @@ public class Event implements IEvent {
     return this.timestamp;
   }
 
-  @Override
+  public String getEventName() {
+    return eventName;
+  }
+
+  public void setEventName(String eventName) {
+    this.eventName = eventName;
+  }
+
   public boolean isAlive(int ttl) {
     if (ttl > 0)
       return this.getTimestamp() + (ttl * 1000) > System.currentTimeMillis();
@@ -92,12 +107,9 @@ public class Event implements IEvent {
     return this.eventID;
   }
 
-  /**
-   * Override to return customer user defined ID for sorting results
-   */
-  @Override
-  public String getUserDefinedId() {
-    return Long.toString(this.eventID);
+
+  public Map<String, Object> getEventFieldValues() {
+    return eventFieldValues;
   }
 
 
@@ -109,5 +121,14 @@ public class Event implements IEvent {
       return this.getEventID() == (((IEvent) event).getEventID());
   }
 
-
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("Event{");
+    sb.append("eventName='").append(eventName).append('\'');
+    sb.append(", eventID=").append(eventID);
+    sb.append(", timestamp=").append(timestamp);
+    sb.append(", eventFieldValues=").append(eventFieldValues);
+    sb.append('}');
+    return sb.toString();
+  }
 }

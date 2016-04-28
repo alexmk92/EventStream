@@ -28,7 +28,7 @@ import java.util.concurrent.locks.LockSupport;
 public class Stream {
 
   //stream variables
-  private final WorkerExecution eventWorkerExecution;
+  private final QueryStore eventQueryStore;
 
   private StreamDefinition streamDefinition;
 
@@ -74,7 +74,7 @@ public class Stream {
     this.eventqueue_out = new IEvent[this.queue_max_size];
     this.streamName = streamName;
     this.eventTTL = eventTTL;
-    this.eventWorkerExecution = new WorkerExecution(this, worker, comparator, eventTTL);
+    this.eventQueryStore = new QueryStore(this, worker, comparator, eventTTL);
     this.workerParams=workerParams;
   }
   /**
@@ -108,8 +108,8 @@ public class Stream {
    *
    * @return
    */
-  public WorkerExecution getEventWorkerExecution() {
-    return eventWorkerExecution;
+  public QueryStore getEventQueryStore() {
+    return eventQueryStore;
   }
 
   /**

@@ -30,12 +30,6 @@ public interface IEvent<T> {
     public boolean isAlive(int ttl);
 
     /**
-     * Override to return a user defined id that can be used for ordering results
-     * @return
-     */
-    public String getUserDefinedId();
-
-    /**
      * Return value of given event field name
      * @return
      */

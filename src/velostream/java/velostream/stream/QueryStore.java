@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The velostream.event eventQueryStore where the putAll events are persisted in memory
  */
-public class WorkerExecution {
+public class QueryStore {
 
     protected ConcurrentSkipListSet<IEvent> workerresults;
     protected int eventTTL=0;
@@ -22,7 +22,7 @@ public class WorkerExecution {
     private boolean isEnd = false;
     private IEventWorker worker;
 
-    private WorkerResultQueryOperations workerResultQueryOperations =null;
+    private QueryOperations queryOperations =null;
 
     /**
      * New Event Worker Execution using the given checked Comparator</IEvent> to order the results
@@ -32,7 +32,7 @@ public class WorkerExecution {
      * @param theComparator
      * @param eventTTL
      */
-    public WorkerExecution(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
+    public QueryStore(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
         this.stream = stream;
         if (worker!=null)
                 this.worker=worker;
@@ -51,7 +51,7 @@ public class WorkerExecution {
             if (comparator==null) comparator = new EventUnorderedComparator();
         }
         workerresults = new ConcurrentSkipListSet<IEvent>(comparator);
-        workerResultQueryOperations = new WorkerResultQueryOperations(this);
+        queryOperations = new QueryOperations(this);
         if (eventTTL>0)
             Execute.getInstance().submit(new ExpiredEventsCollector());
 
@@ -70,8 +70,8 @@ public class WorkerExecution {
      * Get the query stores query operations
      * @return
      */
-    public WorkerResultQueryOperations getWorkerResultQueryOperations() {
-        return workerResultQueryOperations;
+    public QueryOperations getQueryOperations() {
+        return queryOperations;
     }
 
     /**
@@ -87,18 +87,18 @@ public class WorkerExecution {
      */
     private class WorkerInput implements Runnable {
 
-        WorkerExecution workerExecution;
+        QueryStore queryStore;
 
-        public WorkerInput(WorkerExecution workerExecution) {
-            this.workerExecution = workerExecution;
+        public WorkerInput(QueryStore queryStore) {
+            this.queryStore = queryStore;
         }
 
         @Override
         public void run() {
             try {
                 while (!stream.isEnd())
-                    this.workerExecution.work(stream.getAll());
-                this.workerExecution.work(stream.getAll());
+                    this.queryStore.work(stream.getAll());
+                this.queryStore.work(stream.getAll());
                 isEnd=true;
             } catch (Exception e) {
                 e.printStackTrace();

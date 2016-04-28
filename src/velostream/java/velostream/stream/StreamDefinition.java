@@ -5,6 +5,7 @@ import com.sun.istack.internal.Nullable;
 import velostream.event.PassthroughEventWorker;
 import velostream.interfaces.IEventWorker;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -30,33 +31,14 @@ public class StreamDefinition {
     super();
   }
 
-  public StreamDefinition(String name, @Nullable String description,
-      @Nullable String timestampfieldname, int eventsTTLSeconds, int orderBy,
-      @Nullable String orderbyField, @Nullable String eventWorker,
-      Map<String, Object> workerParams) {
-    if (name == null || name.equals(""))
-      throw new IllegalArgumentException("name is mandatory");
-    if (eventsTTLSeconds < 0)
-      throw new IllegalArgumentException("eventTTLSeconds must be >=0");
-    if (description == null)
-      description = "no description provided";
-    if (timestampfieldname == null || timestampfieldname.isEmpty())
-      timestampfieldname = "Timestamp";
-    if (orderBy < 0 || orderBy > 3)
-      throw new IllegalArgumentException("incorrect orderby value");
-    if (eventWorker == null)
-      this.eventWorkerName = "velostream.event.PassthroughEventWorker";
-    else
-      this.eventWorkerName = eventWorker;
-
-
-    this.orderbyField = orderbyField;
-    this.orderBy = orderBy;
-    this.name = name;
-    this.timestampfieldname = timestampfieldname;
-    this.description = description;
-    this.eventTTLSeconds = eventsTTLSeconds;
-    this.workerParams = workerParams;
+  public StreamDefinition (String streamName) {
+      this.name=streamName;
+      this.description="";
+      this.orderBy=StreamOrderBy.ORDERBY_UNORDERED;
+      this.orderbyField="Timestamp";
+      this.eventTTLSeconds=0;
+      this.eventWorkerName=PassthroughEventWorker.class.getName();
+      this.workerParams= new HashMap<>();
   }
 
   public String getName() {
@@ -99,6 +81,30 @@ public class StreamDefinition {
       return new PassthroughEventWorker();
     }
 
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setTimestampfieldname(String timestampfieldname) {
+    this.timestampfieldname = timestampfieldname;
+  }
+
+  public void setEventTTLSeconds(int eventTTLSeconds) {
+    this.eventTTLSeconds = eventTTLSeconds;
+  }
+
+  public void setOrderBy(int orderBy) {
+    this.orderBy = orderBy;
+  }
+
+  public void setOrderbyField(String orderbyField) {
+    this.orderbyField = orderbyField;
+  }
+
+  public void setEventWorkerName(String eventWorkerName) {
+    this.eventWorkerName = eventWorkerName;
   }
 
   @Override

@@ -3,6 +3,9 @@ package velostream.event;
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,15 +13,8 @@ import java.util.Map;
  */
 public class SimpleFilterEventWorker implements IEventWorker {
 
-  public enum Operator {
-    CONTAINS("?"), GT(">"), LT("<"), EQ("=");
 
-    private final String operator;
-
-    Operator(String operator) {
-      this.operator = operator;
-    }
-  }
+  private final List<Character> operator = Arrays.asList('?', '>', '<', '=');
 
   public IEvent work(IEvent eventIn, Map<String, Object> filterParams) {
     if (filterParams == null)
@@ -28,8 +24,8 @@ public class SimpleFilterEventWorker implements IEventWorker {
       Object value = filterParams.get("value");
       String operator = (String) filterParams.get("operator");
 
-      switch (Operator.valueOf(operator)) {
-        case CONTAINS:
+      switch (operator.charAt(0)) {
+        case '?':
           return doContains(eventIn, field, value);
       }
 
@@ -39,7 +35,7 @@ public class SimpleFilterEventWorker implements IEventWorker {
   }
 
   private IEvent doContains(IEvent event, String field, Object value) {
-    if (event.getFieldValue(field).toString().contains(value.toString()))
+    if (event.getFieldValue(field)!=null && event.getFieldValue(field).toString().contains(value.toString()))
       return event;
     else
       return EmptyEvent.INSTANCE;
