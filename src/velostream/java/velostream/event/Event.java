@@ -96,6 +96,7 @@ public class Event implements IEvent {
     this.eventName = eventName;
   }
 
+  @Override
   public boolean isAlive(int ttl) {
     if (ttl > 0)
       return this.getTimestamp() + (ttl * 1000) > System.currentTimeMillis();

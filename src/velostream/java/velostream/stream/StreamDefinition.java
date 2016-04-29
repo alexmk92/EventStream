@@ -1,8 +1,7 @@
 package velostream.stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.internal.Nullable;
-import velostream.event.PassthroughEventWorker;
+import velostream.stream.workers.PassthroughEventWorker;
 import velostream.interfaces.IEventWorker;
 
 import java.util.HashMap;
@@ -22,8 +21,6 @@ public class StreamDefinition {
   private String description;
   private String timestampfieldname;
   private int eventTTLSeconds;
-  private int orderBy;
-  private String orderbyField;
   private String eventWorkerName;
   private Map<String, Object> workerParams;
 
@@ -34,8 +31,6 @@ public class StreamDefinition {
   public StreamDefinition (String streamName) {
       this.name=streamName;
       this.description="";
-      this.orderBy=StreamOrderBy.ORDERBY_UNORDERED;
-      this.orderbyField="Timestamp";
       this.eventTTLSeconds=0;
       this.eventWorkerName=PassthroughEventWorker.class.getName();
       this.workerParams= new HashMap<>();
@@ -45,9 +40,6 @@ public class StreamDefinition {
     return this.name;
   }
 
-  public int getOrderBy() {
-    return orderBy;
-  }
 
   public String getDescription() {
     return this.description;
@@ -59,10 +51,6 @@ public class StreamDefinition {
 
   public String getTimestampfieldname() {
     return timestampfieldname;
-  }
-
-  public String getOrderbyField() {
-    return orderbyField;
   }
 
   public String getEventWorkerName() {
@@ -93,14 +81,6 @@ public class StreamDefinition {
 
   public void setEventTTLSeconds(int eventTTLSeconds) {
     this.eventTTLSeconds = eventTTLSeconds;
-  }
-
-  public void setOrderBy(int orderBy) {
-    this.orderBy = orderBy;
-  }
-
-  public void setOrderbyField(String orderbyField) {
-    this.orderbyField = orderbyField;
   }
 
   public void setEventWorkerName(String eventWorkerName) {

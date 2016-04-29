@@ -1,4 +1,6 @@
-package velostream.stream;
+package velostream.util;
+
+import velostream.stream.StreamDefinition;
 
 public class StreamDefinitionBuilder {
 
@@ -31,16 +33,6 @@ public class StreamDefinitionBuilder {
 
   public StreamDefinitionBuilder addEventWorkerParam(String paramName, Object value) {
     this.streamDefinition.getWorkerParams().put(paramName, value);
-    return this;
-  }
-
-  public StreamDefinitionBuilder setOrderBy(int orderBy) {
-    this.streamDefinition.setOrderBy(orderBy);
-    return this;
-  }
-
-  public StreamDefinitionBuilder setOrderByField(String field) {
-    this.streamDefinition.setOrderbyField(field);
     return this;
   }
 

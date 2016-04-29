@@ -1,4 +1,4 @@
-package velostream.event;
+package velostream.stream.workers;
 
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;

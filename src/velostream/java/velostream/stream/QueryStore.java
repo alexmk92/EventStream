@@ -1,8 +1,8 @@
 package velostream.stream;
 
 import com.sun.istack.internal.Nullable;
-import velostream.event.EventUnorderedComparator;
-import velostream.event.PassthroughEventWorker;
+import velostream.event.EventTimestampComparator;
+import velostream.stream.workers.PassthroughEventWorker;
 import velostream.event.WatermarkEvent;
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;
@@ -29,28 +29,16 @@ public class QueryStore {
      * passing velostream.event time to live > 0 when using the EventTimestampComparator specifies how long events
      * in seconds will be retained before being automatically removed from the worker results
      * @param stream
-     * @param theComparator
      * @param eventTTL
      */
-    public QueryStore(Stream stream, @Nullable IEventWorker worker, Comparator<IEvent> theComparator , int eventTTL) {
+    public QueryStore(Stream stream, @Nullable IEventWorker worker, int eventTTL) {
         this.stream = stream;
         if (worker!=null)
                 this.worker=worker;
         else this.worker=new PassthroughEventWorker();
         this.eventTTL=eventTTL;
 
-        Comparator<IEvent> comparator=null;
-        try {
-            comparator=theComparator.getClass().newInstance();
-        }
-        catch (InstantiationException e1) {
-        }
-        catch (IllegalAccessException e2) {
-        }
-        finally {
-            if (comparator==null) comparator = new EventUnorderedComparator();
-        }
-        workerresults = new ConcurrentSkipListSet<IEvent>(comparator);
+        workerresults = new ConcurrentSkipListSet<IEvent>(new EventTimestampComparator());
         queryOperations = new QueryOperations(this);
         if (eventTTL>0)
             Execute.getInstance().submit(new ExpiredEventsCollector());

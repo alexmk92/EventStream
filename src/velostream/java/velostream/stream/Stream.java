@@ -52,6 +52,7 @@ public class Stream {
   private volatile boolean flush = false;
   //locks
   private Object lock = new Object();
+
   /**
    * Construct a new StreamAPIResource with the given velostream.event comparator and velostream.event time to live
    * <p>
@@ -65,20 +66,21 @@ public class Stream {
    * a value <=0 will never remove results
    *
    * @param streamName
-   * @param comparator
    * @param eventTTL
    */
-  public Stream(String streamName, IEventWorker worker, Map<String, Object> workerParams, Comparator<IEvent> comparator,
+  public Stream(String streamName, IEventWorker worker, Map<String, Object> workerParams,
       int eventTTL) {
     this.event_queue = new LinkedBlockingQueue<IEvent>(queue_max_size);
     this.eventqueue_out = new IEvent[this.queue_max_size];
     this.streamName = streamName;
     this.eventTTL = eventTTL;
-    this.eventQueryStore = new QueryStore(this, worker, comparator, eventTTL);
-    this.workerParams=workerParams;
+    this.eventQueryStore = new QueryStore(this, worker, eventTTL);
+    this.workerParams = workerParams;
   }
+
   /**
    * The streams name
+   *
    * @return
    */
   public String getStreamName() {

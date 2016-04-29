@@ -1,4 +1,6 @@
-package velostream.event;
+package velostream.util;
+
+import velostream.event.Event;
 
 public class EventBuilder {
 
