@@ -155,7 +155,7 @@ public class TestWebAPI {
     event_fields.put("value", "dispatched");
 
     StreamDefinition sd = StreamDefinitionBuilder.builder(ORDER_DELIVERY_STREAM)
-        .addEventWorker(SimpleFilterEventWorker.class)
+        .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")
         .addEventWorkerParam("value", "dispatched").build();
 

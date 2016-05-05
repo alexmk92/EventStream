@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import velostream.stream.workers.PassthroughEventWorker;
 import velostream.interfaces.IEventWorker;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,25 +22,25 @@ public class StreamDefinition {
   private String description;
   private String timestampfieldname;
   private int eventTTLSeconds;
-  private String eventWorkerName;
+  private IEventWorker eventWorker;
+  private String eventWorkerClassName;
   private Map<String, Object> workerParams;
 
   public StreamDefinition() {
     super();
   }
 
-  public StreamDefinition (String streamName) {
-      this.name=streamName;
-      this.description="";
-      this.eventTTLSeconds=0;
-      this.eventWorkerName=PassthroughEventWorker.class.getName();
-      this.workerParams= new HashMap<>();
+  public StreamDefinition(String streamName) {
+    this.name = streamName;
+    this.description = "";
+    this.eventTTLSeconds = 0;
+    this.eventWorkerClassName = PassthroughEventWorker.class.getName();
+    this.workerParams = new HashMap<>();
   }
 
   public String getName() {
     return this.name;
   }
-
 
   public String getDescription() {
     return this.description;
@@ -53,22 +54,27 @@ public class StreamDefinition {
     return timestampfieldname;
   }
 
-  public String getEventWorkerName() {
-    return eventWorkerName;
-  }
-
-  public Map<String, Object> getWorkerParams() {
-    return workerParams;
+  @JsonIgnore
+  public IEventWorker getEventWorker() {
+    return this.eventWorker;
   }
 
   @JsonIgnore
-  public IEventWorker getEventWorker() {
-    try {
-      return (IEventWorker) Class.forName(this.eventWorkerName).newInstance();
-    } catch (Exception e) {
-      return new PassthroughEventWorker();
-    }
+  public void setEventWorker(IEventWorker eventWorker) {
+    this.eventWorker = eventWorker;
+  }
 
+  public String getEventWorkerClassName() {
+    return this.eventWorkerClassName;
+  }
+  public void setEventWorkerClassName(String eventWorkerClassName) throws Exception{
+    this.eventWorkerClassName = eventWorkerClassName;
+    this.eventWorker = (IEventWorker) Class.forName(eventWorkerClassName).newInstance();
+  }
+
+
+  public Map<String, Object> getWorkerParams() {
+    return workerParams;
   }
 
   public void setDescription(String description) {
@@ -83,9 +89,6 @@ public class StreamDefinition {
     this.eventTTLSeconds = eventTTLSeconds;
   }
 
-  public void setEventWorkerName(String eventWorkerName) {
-    this.eventWorkerName = eventWorkerName;
-  }
 
   @Override
   public String toString() {

@@ -1,5 +1,6 @@
 package velostream.util;
 
+import velostream.interfaces.IEventWorker;
 import velostream.stream.StreamDefinition;
 
 public class StreamDefinitionBuilder {
@@ -25,9 +26,14 @@ public class StreamDefinitionBuilder {
     return this;
   }
 
-  public StreamDefinitionBuilder addEventWorker(Class eventWorkerClassName)
+  public StreamDefinitionBuilder addEventWorkerByClassName(String name) throws Exception
   {
-    this.streamDefinition.setEventWorkerName(eventWorkerClassName.getName());
+    this.streamDefinition.setEventWorkerClassName(name);
+    return this;
+  }
+  public StreamDefinitionBuilder addEventWorker(IEventWorker eventWorker)
+  {
+    this.streamDefinition.setEventWorker(eventWorker);
     return this;
   }
 

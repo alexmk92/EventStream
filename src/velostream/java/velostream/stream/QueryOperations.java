@@ -1,9 +1,9 @@
 package velostream.stream;
 
+import velostream.event.EventTimestampComparator;
 import velostream.interfaces.IEvent;
 
-import java.util.List;
-import java.util.NavigableSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
@@ -17,6 +17,16 @@ public class QueryOperations {
 
   private ConcurrentSkipListSet<IEvent> querystorecontents = null;
   private int eventTTL;
+
+  private class EventKeyIDEntry {
+      private String key;
+      private Long timestamp;
+      private Long event_id;
+      public EventKeyIDEntry (String key, Long event_id) {
+        this.key=key;
+        this.event_id=event_id;
+      }
+  }
 
   public QueryOperations(QueryStore queryStore) {
     this.querystorecontents = queryStore.workerresults;
@@ -58,6 +68,16 @@ public class QueryOperations {
 
   public IEvent getLast() {
     return this.querystorecontents.last();
+  }
+
+  public IEvent[] getEachLastBy(String fieldname) {
+
+     querystorecontents.stream()
+        .collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname), Collectors.maxBy(
+            new EventTimestampComparator()))).forEach((id,event)->Collectors.toList());
+    return null;
+
+
   }
 
   public IEvent getFirst() {
