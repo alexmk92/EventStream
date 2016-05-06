@@ -1,4 +1,4 @@
-package geoTrackingExample;
+package geoTrackingExample.domain;
 
 /**
  * Created by Rich on 05/05/2016.

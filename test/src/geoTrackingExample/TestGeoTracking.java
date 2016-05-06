@@ -1,47 +1,43 @@
 package geoTrackingExample;
 
+import geoTrackingExample.domain.AlertType;
+import geoTrackingExample.domain.Journey;
+import geoTrackingExample.domain.Stop;
+import geoTrackingExample.worker.GeoEventWorker;
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
-import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
 import velostream.StreamAPI;
-import velostream.exceptions.StreamNotFoundException;
-import velostream.interfaces.IEventWorker;
 import velostream.stream.Stream;
 import velostream.util.EventBuilder;
 import velostream.util.StreamDefinitionBuilder;
 import velostream.web.StreamAPIApp;
 
-import java.util.ArrayList;
-
 public class TestGeoTracking {
 
 
-  static long FIFTEEN_MINUTES_Milliseconds = 15*60*1000;
+  static long FIFTEEN_MINUTES_Milliseconds = 15 * 60 * 1000;
 
-  private static ArrayList<Stop> stops = new ArrayList<>();
+  private static Journey journey = new Journey();
   private static UndertowJaxrsServer server;
   private static Stream quotestream;
   private static GeoEventWorker geoWorker;
 
   @BeforeClass
   public static void setup() {
-    Stop stop1 = new Stop("Laurence", 51.509041, -0.030198, System.currentTimeMillis()+16*60*1000);
-    Stop stop2 = new Stop("Rich", 51.513545, -0.027418, System.currentTimeMillis()+26*60*1000);
-    Stop stop3 = new Stop("Sandeep", 51.515618,  -0.038754, System.currentTimeMillis()+42*60*1000);
-    Stop stop4 = new Stop("Sheryl", 51.529399, -0.067545, System.currentTimeMillis()+55*60*1000);
-    Stop stop5 = new Stop("Louise", 51.543092, -0.082458, System.currentTimeMillis()+75*60*1000);
+    setupUndertow();
+    StreamAPI.newStream(
+        StreamDefinitionBuilder.builder("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker=new GeoEventWorker())
+            .build());
+    setupJourney();
+    geoWorker.setJourney(journey);
+  }
 
-    stops.add(stop1);
-    stops.add(stop2);
-    stops.add(stop3);
-    stops.add(stop4);
-    stops.add(stop5);
-
-
-    //given
+  public static void setupUndertow() {
     Undertow.Builder serverBuilder =
         Undertow.builder().addHttpListener(8081, "127.0.0.1").setWorkerThreads(4);
     server = new UndertowJaxrsServer().start(serverBuilder);
@@ -49,32 +45,45 @@ public class TestGeoTracking {
     di.setContextPath("/");
     di.setDeploymentName("velostream");
     server.deploy(di);
+  }
 
-    geoWorker = new GeoEventWorker();
-    StreamAPI.newStream(
-        StreamDefinitionBuilder.builder("GeoAlert")
-            .setEventTTL(30).addEventWorker(geoWorker).build());
-    geoWorker.setStops(stops);
-
+  public static void setupJourney() {
+    Stop stop1 =
+        new Stop("Laurence", 51.509041, -0.030198, System.currentTimeMillis() + 16 * 60 * 1000);
+    Stop stop2 =
+        new Stop("Rich", 51.513545, -0.027418, System.currentTimeMillis() + 26 * 60 * 1000);
+    Stop stop3 =
+        new Stop("Sandeep", 51.515618, -0.038754, System.currentTimeMillis() + 42 * 60 * 1000);
+    Stop stop4 =
+        new Stop("Sheryl", 51.529399, -0.067545, System.currentTimeMillis() + 55 * 60 * 1000);
+    Stop stop5 =
+        new Stop("Louise", 51.543092, -0.082458, System.currentTimeMillis() + 75 * 60 * 1000);
+    journey.add(stop1);
+    journey.add(stop2);
+    journey.add(stop3);
+    journey.add(stop4);
+    journey.add(stop5);
   }
 
   @Test
-  public void testOnTime() throws StreamNotFoundException {
-    StreamAPI.put("GeoAlert", EventBuilder.builder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07).build(), false);
+  public void testOnTime() throws Exception {
+    StreamAPI.put("GeoAlert",
+        EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
+            .addFieldValue("van_id", 1).addFieldValue("avg_speed", 20.0d).build(), false);
+    Thread.currentThread().sleep(200);
+    Assert.assertThat(StreamAPI.getStream("GeoAlert").getEventQueryStore().getQueryOperations().getLastBy("customerId", "Laurence").getFieldValue("status"), is(
+        AlertType.ONTIME));
   }
 
-
   @Test
-  public void testLate() throws StreamNotFoundException {
+  public void testLate() throws Exception {
     geoWorker.setAvg_roadspeed_KMH(1);
-    StreamAPI.put("GeoAlert", EventBuilder.builder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07).build(), false);
+    StreamAPI.put("GeoAlert",
+        EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
+            .addFieldValue("van_id", 1).addFieldValue("avg_speed", 1.0d).build(), false);
+    Thread.currentThread().sleep(200);
+    Assert.assertThat(StreamAPI.getStream("GeoAlert").getEventQueryStore().getQueryOperations().getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.LATE));
   }
-
-  @AfterClass
-  public static void sleep() throws Exception {
-    Thread.currentThread().sleep(20000);
-  }
-
 
 
 }

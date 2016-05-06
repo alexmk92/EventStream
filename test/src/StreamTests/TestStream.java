@@ -19,18 +19,18 @@ public class TestStream {
         StreamAPI.newStream(StreamDefinitionBuilder.builder("quote").setEventTTL(0).build());
 
     event =
-        EventBuilder.builder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
+        EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
             .build();
     quotestream.put(event, false);
 
     event =
-        EventBuilder.builder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 22.0D)
+        EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 22.0D)
             .build();
 
     quotestream.put(event, false);
 
     event =
-        EventBuilder.builder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 24.0D)
+        EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 24.0D)
             .build();
 
     quotestream.put(event, false);

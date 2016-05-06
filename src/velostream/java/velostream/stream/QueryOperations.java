@@ -1,11 +1,14 @@
 package velostream.stream;
 
+import velostream.event.EmptyEvent;
 import velostream.event.EventTimestampComparator;
 import velostream.interfaces.IEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
+
+import static velostream.event.EmptyEvent.EmptyEvent;
 
 /**
  * QueryStoreQueryOperations
@@ -68,6 +71,15 @@ public class QueryOperations {
 
   public IEvent getLast() {
     return this.querystorecontents.last();
+  }
+
+  public IEvent getLastBy(String fieldname, Object value) {
+    List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL)).filter(i -> i.getFieldValue(fieldname).equals(value))
+        .collect(Collectors.toList());
+    if (events.size()>0)
+      return events.get(events.size()-1);
+    else
+      return EmptyEvent;
   }
 
   public IEvent[] getEachLastBy(String fieldname) {

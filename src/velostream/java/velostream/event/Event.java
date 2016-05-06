@@ -22,32 +22,41 @@ import java.util.Map;
  */
 public class Event implements IEvent {
 
-  private String eventName;
-  private long eventID;
-  private long timestamp;
-  private Map<String, Object> eventFieldValues;
+  private String eventName = "";
+  private long eventID = -1;
+  private long timestamp = -1;
+  private Map<String, Object> eventValues = null;
+  private static final Map<String, Object> EMPTY_FIELD_VALUES = new HashMap<>();
+
 
   public Event() {
     super();
+    this.timestamp = System.currentTimeMillis();
+    this.eventID = Counter.INSTANCE.getNext();
+    this.eventValues = EMPTY_FIELD_VALUES;
   }
 
   public Event(String eventName) {
     this.eventName = eventName;
     this.timestamp = System.currentTimeMillis();
     this.eventID = Counter.INSTANCE.getNext();
-    this.eventFieldValues = new HashMap<>();
+    this.eventValues = EMPTY_FIELD_VALUES;
   }
 
   public Event(long eventid, long timestamp) {
     this.eventID = eventid;
     this.timestamp = timestamp;
-    this.eventFieldValues = new HashMap<>();
+    this.eventValues = EMPTY_FIELD_VALUES;
   }
 
-  public Event(long eventid, long timestamp, Map<String, Object> eventKeyValueMap) {
+  public Event(long eventid, long timestamp, Map<String, Object> eventValues) {
     this.eventID = eventid;
     this.timestamp = timestamp;
-    this.eventFieldValues = eventKeyValueMap;
+    this.eventValues = eventValues;
+  }
+
+  public void setEventValues(Map<String, Object> eventValues) {
+    this.eventValues = eventValues;
   }
 
   public void setEventID(long eventID) {
@@ -59,13 +68,15 @@ public class Event implements IEvent {
   }
 
   public void addFieldValue(String fieldname, Object value) {
-    this.eventFieldValues.put(fieldname, value);
+    if (eventValues.equals(EMPTY_FIELD_VALUES))
+      this.eventValues = new HashMap<>();
+    this.eventValues.put(fieldname, value);
   }
 
   public Object getFieldValue(String name) {
 
-    if (this.eventFieldValues != null) {
-      return eventFieldValues.get(name);
+    if (this.eventValues != null) {
+      return eventValues.get(name);
     } else
       return getFieldValueViaGetter(name);
   }
@@ -108,9 +119,8 @@ public class Event implements IEvent {
     return this.eventID;
   }
 
-
-  public Map<String, Object> getEventFieldValues() {
-    return eventFieldValues;
+  public Map<String, Object> getEventValues() {
+    return eventValues;
   }
 
 
@@ -128,7 +138,7 @@ public class Event implements IEvent {
     sb.append("eventName='").append(eventName).append('\'');
     sb.append(", eventID=").append(eventID);
     sb.append(", timestamp=").append(timestamp);
-    sb.append(", eventFieldValues=").append(eventFieldValues);
+    sb.append(", eventValues=").append(eventValues);
     sb.append('}');
     return sb.toString();
   }

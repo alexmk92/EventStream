@@ -100,7 +100,7 @@ public class QueryStore {
      * @param events
      */
     private void work(IEvent[] events) {
-        Arrays.stream(events).forEach(event -> workerresults.add(callWorker(event, stream.getWorkerParams())));
+        Arrays.stream(events).forEach(event -> workerresults.addAll(callWorker(event, stream.getWorkerParams())));
     }
 
     /**
@@ -108,7 +108,7 @@ public class QueryStore {
      * @param event
      * @return
      */
-    private IEvent callWorker(IEvent event, Map<String, Object> workerParams){
+    private List<IEvent> callWorker(IEvent event, Map<String, Object> workerParams){
         return this.worker.work(event, workerParams);
     }
 

@@ -1,15 +1,14 @@
-package geoTrackingExample;
+package geoTrackingExample.worker;
 
+import geoTrackingExample.domain.AlertType;
+import geoTrackingExample.util.LatLongDistanceCalculator;
+import geoTrackingExample.domain.Stop;
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;
-import velostream.util.EventBuilder;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
+import static velostream.util.EventBuilder.eventBuilder;
 
-
+import java.util.*;
 
 public class GeoEventWorker implements IEventWorker {
 
@@ -31,24 +30,19 @@ public class GeoEventWorker implements IEventWorker {
     this.avg_roadspeed_KMH = avg_roadspeed_KMH;
   }
 
-
-  public void setStops(ArrayList<Stop> stops) {
+  public void setJourney(ArrayList<Stop> stops) {
     this.stops = stops;
   }
 
   private ArrayList<Stop> getStopsForNextHour(long currentTimeMilliseconds) {
-
     ArrayList<Stop> next_stops = new ArrayList<>();
-
     for (Stop stop : stops) {
       if (isStopInDeliveryWindow(currentTimeMilliseconds, stop)) {
         next_stops.add(stop);
 
       }
     }
-
     return next_stops;
-
   }
 
   public boolean isStopInDeliveryWindow(long currentTimeMilliseconds, Stop stop) {
@@ -71,13 +65,12 @@ public class GeoEventWorker implements IEventWorker {
         * 1000;
   }
 
-
   public boolean isOnTime(Stop stop, double avg_road_speed) {
 
     long time_to_first_delivery = getTravelTimeToFirstDeliveryInMillisecods(avg_road_speed);
 
-    long latemillis =    ((getCurrentTimeInMillisecconds() + time_to_first_delivery)
-            - stop.getExpected_delivery_timestamp());
+    long latemillis = ((getCurrentTimeInMillisecconds() + time_to_first_delivery) - stop
+        .getExpected_delivery_timestamp());
 
     if (latemillis > 0) {
       int deliveryHour = getDeliveryHour(latemillis + stop.getExpected_delivery_timestamp());
@@ -93,25 +86,22 @@ public class GeoEventWorker implements IEventWorker {
   int getDeliveryHour(long timestamp) {
     Calendar now = Calendar.getInstance();
     now.setTime(new Date(timestamp));
-    return now.get(Calendar.HOUR);
+    return now.get(Calendar.HOUR_OF_DAY);
   }
 
   long getCurrentTimeInMillisecconds() {
     return System.currentTimeMillis();
   }
 
-  long getCurrentTimeInSeconds() {
-    return System.currentTimeMillis() / 1000 / 60;
-  }
-
   long getMinutesToTimeStampFromNow(long timestamp) {
-    return (timestamp-getCurrentTimeInMillisecconds())/1000/60;
+    return (timestamp - getCurrentTimeInMillisecconds()) / 1000 / 60;
   }
 
-  public IEvent work(IEvent eventIn, Map<String, Object> params) {
-    ArrayList<GeoAlert> alerts = new ArrayList<>();
+  public List<IEvent> work(IEvent eventIn, Map<String, Object> params) {
+    ArrayList<IEvent> alerts = new ArrayList<>();
     van_lat = (double) eventIn.getFieldValue("lat");
     van_lon = (double) eventIn.getFieldValue("lon");
+    avg_roadspeed_KMH = (double) eventIn.getFieldValue("avg_speed");
 
     ArrayList<Stop> stops_remaining = getStopsForNextHour(getCurrentTimeInMillisecconds());
     if (stops_remaining.size() > 0) {
@@ -119,17 +109,19 @@ public class GeoEventWorker implements IEventWorker {
 
       for (Stop stop : getStopsForNextHour(getCurrentTimeInMillisecconds())) {
         if (isOnTime(stop, getAvg_roadspeed_KMH()))
-          alerts.add(
-              new GeoAlert(AlertType.ONTIME, stop.getCustomerId(), "Your delivery is on time",
-                  getMinutesToTimeStampFromNow(stop.getExpected_delivery_timestamp())));
+          alerts.add(eventBuilder("CustomerGeoUpdate").addFieldValue("status", AlertType.ONTIME)
+              .addFieldValue("customerId", stop.getCustomerId())
+              .addFieldValue("message", "Your Delivery Is On Time").build());
         else
-          alerts.add(new GeoAlert(AlertType.LATE, stop.getCustomerId(), "Your delivery is late",
-              getMinutesToTimeStampFromNow(stop.getExpected_delivery_timestamp() + getTravelTimeToFirstDeliveryInMillisecods(
-                  this.getAvg_roadspeed_KMH()))));
+          alerts.add(eventBuilder("CustomerGeoUpdate").addFieldValue("status", AlertType.LATE)
+              .addFieldValue("customerId", stop.getCustomerId())
+              .addFieldValue("message", "Your Delivery Is Late").addFieldValue("expected_mins",
+                  getMinutesToTimeStampFromNow(stop.getExpected_delivery_timestamp()
+                      + getTravelTimeToFirstDeliveryInMillisecods(avg_roadspeed_KMH))).build());
+
       }
 
-      return EventBuilder.builder("geoalert").addFieldValue("Alert", alerts).build();
     }
-    return null;
+    return alerts;
   }
 }

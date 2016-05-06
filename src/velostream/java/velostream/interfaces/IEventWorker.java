@@ -1,6 +1,7 @@
 package velostream.interfaces;
 
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,5 +12,5 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public interface IEventWorker {
-    public IEvent work(IEvent toprocess, Map<String, Object> params);
+    public List<IEvent> work(IEvent toprocess, Map<String, Object> params);
 }

@@ -26,6 +26,14 @@ public class StreamAPIResource {
     return StreamAPI.doQuery(streamname, querytype, fieldname);
   }
 
+  @GET
+  @Path("/{streamname}/{querytype}/{fieldname}/{value}")
+  @Produces("application/json")
+  public Object getQueryBy(@PathParam("streamname") String streamname,
+      @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname,  @PathParam("value") String value) {
+    return StreamAPI.doQuery(streamname, querytype, fieldname, value);
+  }
+
   @POST
   @Path("/{streamname}")
   @Consumes("application/json")
@@ -38,7 +46,6 @@ public class StreamAPIResource {
       throw new BadRequestException(e);
     }
   }
-
 
   @POST
   @Path("/")

@@ -1,3 +1,5 @@
+package WebAPITesting;
+
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.test.TestPortProvider;
@@ -44,7 +46,7 @@ public class TestWebAPI {
         StreamDefinitionBuilder.builder("quote")
             .setEventTTL(1).build());
     Event event =
-        EventBuilder.builder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
+        EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
             .build();
     quotestream.put(event, false);
     Thread.currentThread().sleep(1000);
@@ -87,7 +89,7 @@ public class TestWebAPI {
     Client client = ClientBuilder.newClient();
     try {
       Event event =
-          EventBuilder.builder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", 2.0D)
+          EventBuilder.eventBuilder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", 2.0D)
               .build();
       Response response = client.target(TestPortProvider.generateURL("/stream/quote")).request()
           .post(Entity.entity(event, MediaType.APPLICATION_JSON_TYPE));
@@ -105,7 +107,7 @@ public class TestWebAPI {
       double n = 2.0;
       for (int i = 0; i < 5000; i++) {
         Event event =
-            EventBuilder.builder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", n)
+            EventBuilder.eventBuilder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", n)
                 .build();
         Response response = client.target(TestPortProvider.generateURL("/stream/quote")).request()
             .post(Entity.entity(event, MediaType.APPLICATION_JSON_TYPE));
@@ -171,11 +173,11 @@ public class TestWebAPI {
       response.close();
 
       Event eventInFilter =
-          EventBuilder.builder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
+          EventBuilder.eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
               .addFieldValue("delivery_status", "dispatched").build();
 
       Event eventNotInFilter =
-          EventBuilder.builder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
+          EventBuilder.eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
               .addFieldValue("delivery_status", "delivered").build();
 
       response =

@@ -1,18 +1,10 @@
-package geoTrackingExample;
+package geoTrackingExample.util;
 
 public class LatLongDistanceCalculator
 {
 
   public static final String UNIT_KILOMETERS = "K";
   public static final String UNIT_MILES = "M";
-
-
-  public static void main (String[] args) throws java.lang.Exception
-  {
-    System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "M") + " Miles\n");
-    System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "K") + " Kilometers\n");
-    System.out.println(distance(32.9697, -96.80322, 29.46786, -98.53506, "N") + " Nautical Miles\n");
-  }
 
   public static double distance(double lat1, double lon1, double lat2, double lon2, String unit) {
     double theta = lon1 - lon2;
@@ -34,16 +26,10 @@ public class LatLongDistanceCalculator
       return (distance/avg_road_speed_km_hour)*60*60;
   }
 
-  /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-	/*::	This function converts decimal degrees to radians						 :*/
-	/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
   private static double deg2rad(double deg) {
     return (deg * Math.PI / 180.0);
   }
 
-  /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-	/*::	This function converts radians to decimal degrees						 :*/
-	/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
   private static double rad2deg(double rad) {
     return (rad * 180 / Math.PI);
   }

@@ -117,7 +117,7 @@ public class StreamAPI {
    */
   static final String[] queryTypes =
       new String[] {"All", "Last", "First", "AllAfter", "AllBefore", "Average", "Max", "Min",
-          "Count", "Filter"};
+          "Count", "Filter", "LastBy"};
 
   /**
    * Executes the query of type query type on the stream with the given query parameters
@@ -187,6 +187,11 @@ public class StreamAPI {
             toreturn =
                 queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
             break;
+          }
+          case 10: {
+            toreturn = stream.getEventQueryStore().getQueryOperations().getLastBy((String) queryParams[0], queryParams[1]);
+            break;
+
           }
           default: {
             throw new UnsupportedOperationException(queryType);

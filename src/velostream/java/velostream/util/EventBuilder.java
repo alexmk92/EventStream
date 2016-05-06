@@ -11,7 +11,7 @@ public class EventBuilder {
     this.event = new Event(eventName);
   }
 
-  public static EventBuilder builder(String eventName) {
+  public static EventBuilder eventBuilder(String eventName) {
     return new EventBuilder(eventName);
   }
 

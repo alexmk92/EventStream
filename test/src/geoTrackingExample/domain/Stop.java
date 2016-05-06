@@ -1,4 +1,4 @@
-package geoTrackingExample;
+package geoTrackingExample.domain;
 
 public class Stop {
 
