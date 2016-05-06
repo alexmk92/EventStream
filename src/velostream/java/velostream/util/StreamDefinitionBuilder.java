@@ -12,7 +12,7 @@ public class StreamDefinitionBuilder {
     this.streamDefinition = new StreamDefinition(streamName);
   }
 
-  public static StreamDefinitionBuilder builder(String streamName) {
+  public static StreamDefinitionBuilder streamBuilder(String streamName) {
     return new StreamDefinitionBuilder(streamName);
   }
 

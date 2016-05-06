@@ -17,7 +17,7 @@ import velostream.util.EventBuilder;
 import velostream.util.StreamDefinitionBuilder;
 import velostream.web.StreamAPIApp;
 
-public class TestGeoTracking {
+public class GeoTrackingShould {
 
 
   static long FIFTEEN_MINUTES_Milliseconds = 15 * 60 * 1000;
@@ -31,7 +31,7 @@ public class TestGeoTracking {
   public static void setup() {
     setupUndertow();
     StreamAPI.newStream(
-        StreamDefinitionBuilder.builder("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker=new GeoEventWorker())
+        StreamDefinitionBuilder.streamBuilder("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker=new GeoEventWorker())
             .build());
     setupJourney();
     geoWorker.setJourney(journey);
@@ -66,7 +66,7 @@ public class TestGeoTracking {
   }
 
   @Test
-  public void testOnTime() throws Exception {
+  public void returnONTIMEWhenVehicleCanReachDeliveryGEOOnTime() throws Exception {
     StreamAPI.put("GeoAlert",
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
             .addFieldValue("van_id", 1).addFieldValue("avg_speed", 20.0d).build(), false);
@@ -76,7 +76,7 @@ public class TestGeoTracking {
   }
 
   @Test
-  public void testLate() throws Exception {
+  public void returnLATEWhenVehicleCannotReachDeliveryGEOOnTime() throws Exception {
     geoWorker.setAvg_roadspeed_KMH(1);
     StreamAPI.put("GeoAlert",
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)

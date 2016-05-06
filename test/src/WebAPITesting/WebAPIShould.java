@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestWebAPI {
+public class WebAPIShould {
 
   private static UndertowJaxrsServer server;
   private static Stream quotestream;
@@ -43,7 +43,7 @@ public class TestWebAPI {
 
 
     quotestream = StreamAPI.newStream(
-        StreamDefinitionBuilder.builder("quote")
+        StreamDefinitionBuilder.streamBuilder("quote")
             .setEventTTL(1).build());
     Event event =
         EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
@@ -53,7 +53,7 @@ public class TestWebAPI {
   }
 
   @Test
-  public void testGetAll() throws Exception {
+  public void getAll() throws Exception {
     Client client = ClientBuilder.newClient();
     try {
       System.out.println(TestPortProvider.generateURL("/stream/quote/All").toString());
@@ -71,7 +71,7 @@ public class TestWebAPI {
   }
 
   @Test
-  public void testGetAverage() throws Exception {
+  public void getAverage() throws Exception {
     Client client = ClientBuilder.newClient();
     try {
       String val =
@@ -97,7 +97,7 @@ public class TestWebAPI {
     } finally {
       client.close();
     }
-    this.testGetAll();
+    this.getAll();
   }
 
   @Test
@@ -118,15 +118,15 @@ public class TestWebAPI {
     } finally {
       client.close();
     }
-    this.testGetAll();
+    this.getAll();
   }
 
   @Test
-  public void testCreateStream() throws Exception {
+  public void createStream() throws Exception {
     //given
 
     StreamDefinition sd =
-        StreamDefinitionBuilder.builder("newstream")
+        StreamDefinitionBuilder.streamBuilder("newstream")
             .setEventTTL(1).build();
 
     Client client = ClientBuilder.newClient();
@@ -146,7 +146,7 @@ public class TestWebAPI {
   }
 
   @Test
-  public void testTestSimpleFilter() throws Exception {
+  public void doSimpleFilter() throws Exception {
 
     String ORDER_DELIVERY_STREAM = "orderdeliverystream";
 
@@ -156,7 +156,7 @@ public class TestWebAPI {
     event_fields.put("operator", "?");
     event_fields.put("value", "dispatched");
 
-    StreamDefinition sd = StreamDefinitionBuilder.builder(ORDER_DELIVERY_STREAM)
+    StreamDefinition sd = StreamDefinitionBuilder.streamBuilder(ORDER_DELIVERY_STREAM)
         .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")
         .addEventWorkerParam("value", "dispatched").build();

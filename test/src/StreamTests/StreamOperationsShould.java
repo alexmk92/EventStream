@@ -8,7 +8,7 @@ import velostream.stream.Stream;
 import velostream.util.EventBuilder;
 import velostream.util.StreamDefinitionBuilder;
 
-public class TestStream {
+public class StreamOperationsShould {
 
   Stream quotestream;
 
@@ -16,7 +16,7 @@ public class TestStream {
   public void doSetup() throws Exception {
     Event event;
     quotestream =
-        StreamAPI.newStream(StreamDefinitionBuilder.builder("quote").setEventTTL(0).build());
+        StreamAPI.newStream(StreamDefinitionBuilder.streamBuilder("quote").setEventTTL(0).build());
 
     event =
         EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
