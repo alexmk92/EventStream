@@ -5,7 +5,7 @@ import velostream.interfaces.IEvent;
 public final class EmptyEvent extends Event {
 
   public EmptyEvent() {
-    setEventName("EmptyEvent");
+    setEventName("EMPTY_EVENT");
   }
 
   @Override
@@ -13,5 +13,5 @@ public final class EmptyEvent extends Event {
     return false;
   }
 
-  public static final IEvent EmptyEvent = new EmptyEvent();
+  public static final IEvent EMPTY_EVENT = new EmptyEvent();
 }

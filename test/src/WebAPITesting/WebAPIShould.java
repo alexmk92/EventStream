@@ -43,7 +43,7 @@ public class WebAPIShould {
 
 
     quotestream = StreamAPI.newStream(
-        StreamDefinitionBuilder.streamBuilder("quote")
+        StreamDefinitionBuilder.streamDefinition("quote")
             .setEventTTL(1).build());
     Event event =
         EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
@@ -63,7 +63,7 @@ public class WebAPIShould {
       for (Event event : eventList) {
         System.out.println(event.toString());
       }
-      System.out.println(eventList.length + ":" + quotestream.getEventQueryStore().getQueryOperations().getCount());
+      System.out.println(eventList.length + ":" + quotestream.query().getCount());
     } finally {
       client.close();
     }
@@ -126,7 +126,7 @@ public class WebAPIShould {
     //given
 
     StreamDefinition sd =
-        StreamDefinitionBuilder.streamBuilder("newstream")
+        StreamDefinitionBuilder.streamDefinition("newstream")
             .setEventTTL(1).build();
 
     Client client = ClientBuilder.newClient();
@@ -137,7 +137,7 @@ public class WebAPIShould {
           .post(Entity.entity(sd, MediaType.APPLICATION_JSON_TYPE));
       //then
       Assert.assertThat(response.getStatus(), is(201));
-      Assert.assertNotNull(StreamAPI.getStream("newstream"));
+      Assert.assertNotNull(StreamAPI.stream("newstream"));
     } finally {
       client.close();
     }
@@ -156,7 +156,7 @@ public class WebAPIShould {
     event_fields.put("operator", "?");
     event_fields.put("value", "dispatched");
 
-    StreamDefinition sd = StreamDefinitionBuilder.streamBuilder(ORDER_DELIVERY_STREAM)
+    StreamDefinition sd = StreamDefinitionBuilder.streamDefinition(ORDER_DELIVERY_STREAM)
         .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")
         .addEventWorkerParam("value", "dispatched").build();
@@ -169,7 +169,7 @@ public class WebAPIShould {
           .post(Entity.entity(sd, MediaType.APPLICATION_JSON_TYPE));
       //then
       Assert.assertThat(response.getStatus(), is(201));
-      Assert.assertNotNull(StreamAPI.getStream(ORDER_DELIVERY_STREAM));
+      Assert.assertNotNull(StreamAPI.stream(ORDER_DELIVERY_STREAM));
       response.close();
 
       Event eventInFilter =

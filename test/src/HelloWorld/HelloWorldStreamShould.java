@@ -3,24 +3,26 @@ package HelloWorld;
 import org.junit.Assert;
 import org.junit.Test;
 import velostream.StreamAPI;
+
 import static org.hamcrest.CoreMatchers.*;
-import static velostream.util.StreamDefinitionBuilder.streamBuilder;
+import static velostream.util.StreamDefinitionBuilder.streamDefinition;
 import static velostream.util.EventBuilder.eventBuilder;
+import static velostream.StreamAPI.*;
 
 public class HelloWorldStreamShould {
 
-  String HELLO_WORD = "Hello World";
+  String HELLO_WORLD = "Hello World";
 
   @Test
   public void shouldReturnHelloWorldEvent() throws Exception {
-    StreamAPI.newStream(streamBuilder(HELLO_WORD).build())
+    newStream(streamDefinition(HELLO_WORLD).build());
+    stream(HELLO_WORLD)
         .put(eventBuilder("MyHelloWorld").addFieldValue("message", "hello world").build(), false);
-    StreamAPI.getStream(HELLO_WORD).end();
-    while (!StreamAPI.getStream(HELLO_WORD).isEnd())
+    stream(HELLO_WORLD).end();
+    while (!StreamAPI.stream(HELLO_WORLD).isEnd())
       Thread.currentThread().sleep(1);
-    Assert.assertThat(
-        StreamAPI.getStream(HELLO_WORD).getEventQueryStore().getQueryOperations().getLast()
-            .getFieldValue("message"), is("hello world"));
+    Assert.assertThat(stream(HELLO_WORLD).query().getLast().getFieldValue("message"),
+        is("hello world"));
   }
 
 }

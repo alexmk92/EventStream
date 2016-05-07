@@ -1,6 +1,5 @@
 package velostream.stream.workers;
 
-import velostream.event.EmptyEvent;
 import velostream.interfaces.IEvent;
 import velostream.interfaces.IEventWorker;
 
@@ -8,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static velostream.event.EmptyEvent.EmptyEvent;
+import static velostream.event.EmptyEvent.EMPTY_EVENT;
 
 /**
  * Created by Admin on 06/09/2014.
@@ -40,6 +39,6 @@ public class SimpleFilterEventWorker implements IEventWorker {
     if (event.getFieldValue(field)!=null && event.getFieldValue(field).toString().contains(value.toString()))
       return event;
     else
-      return EmptyEvent;
+      return EMPTY_EVENT;
   }
 }

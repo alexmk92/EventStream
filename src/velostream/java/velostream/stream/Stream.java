@@ -101,6 +101,15 @@ public class Stream {
   }
 
   /**
+   * Return the query operations for the query store
+   *
+   * @return
+   */
+  public QueryOperations query() {
+    return eventQueryStore.getQueryOperations();
+  }
+
+  /**
    * Return the query store against which query operations can be made
    *
    * @return
@@ -108,6 +117,7 @@ public class Stream {
   public QueryStore getEventQueryStore() {
     return eventQueryStore;
   }
+
 
   /**
    * Puts an array of events into the stream

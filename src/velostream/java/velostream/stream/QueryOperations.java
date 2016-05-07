@@ -1,6 +1,5 @@
 package velostream.stream;
 
-import velostream.event.EmptyEvent;
 import velostream.event.EventTimestampComparator;
 import velostream.interfaces.IEvent;
 
@@ -8,7 +7,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Collectors;
 
-import static velostream.event.EmptyEvent.EmptyEvent;
+import static velostream.event.EmptyEvent.EMPTY_EVENT;
 
 /**
  * QueryStoreQueryOperations
@@ -79,7 +78,7 @@ public class QueryOperations {
     if (events.size()>0)
       return events.get(events.size()-1);
     else
-      return EmptyEvent;
+      return EMPTY_EVENT;
   }
 
   public IEvent[] getEachLastBy(String fieldname) {

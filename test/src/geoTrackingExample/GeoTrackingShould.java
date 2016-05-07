@@ -10,12 +10,16 @@ import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.is;
+
 import velostream.StreamAPI;
 import velostream.stream.Stream;
 import velostream.util.EventBuilder;
 import velostream.util.StreamDefinitionBuilder;
 import velostream.web.StreamAPIApp;
+
+import static velostream.StreamAPI.stream;
 
 public class GeoTrackingShould {
 
@@ -30,9 +34,8 @@ public class GeoTrackingShould {
   @BeforeClass
   public static void setup() {
     setupUndertow();
-    StreamAPI.newStream(
-        StreamDefinitionBuilder.streamBuilder("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker=new GeoEventWorker())
-            .build());
+    StreamAPI.newStream(StreamDefinitionBuilder.streamDefinition("GeoAlert").setEventTTL(60 * 60)
+        .addEventWorker(geoWorker = new GeoEventWorker()).build());
     setupJourney();
     geoWorker.setJourney(journey);
   }
@@ -67,22 +70,23 @@ public class GeoTrackingShould {
 
   @Test
   public void returnONTIMEWhenVehicleCanReachDeliveryGEOOnTime() throws Exception {
-    StreamAPI.put("GeoAlert",
+    stream("GeoAlert").put(
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
             .addFieldValue("van_id", 1).addFieldValue("avg_speed", 20.0d).build(), false);
     Thread.currentThread().sleep(200);
-    Assert.assertThat(StreamAPI.getStream("GeoAlert").getEventQueryStore().getQueryOperations().getLastBy("customerId", "Laurence").getFieldValue("status"), is(
-        AlertType.ONTIME));
+    Assert.assertThat(stream("GeoAlert").query()
+        .getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.ONTIME));
   }
 
   @Test
   public void returnLATEWhenVehicleCannotReachDeliveryGEOOnTime() throws Exception {
     geoWorker.setAvg_roadspeed_KMH(1);
-    StreamAPI.put("GeoAlert",
+    stream("GeoAlert").put(
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
             .addFieldValue("van_id", 1).addFieldValue("avg_speed", 1.0d).build(), false);
     Thread.currentThread().sleep(200);
-    Assert.assertThat(StreamAPI.getStream("GeoAlert").getEventQueryStore().getQueryOperations().getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.LATE));
+    Assert.assertThat(stream("GeoAlert").query()
+        .getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.LATE));
   }
 
 

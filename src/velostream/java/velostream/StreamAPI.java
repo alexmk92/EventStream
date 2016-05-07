@@ -1,16 +1,12 @@
 package velostream;
 
+import static velostream.event.EmptyEvent.EMPTY_EVENT;
 import velostream.stream.Stream;
-import velostream.event.EventIDComparator;
-import velostream.event.EventTimestampComparator;
 import velostream.exceptions.StreamNotFoundException;
-import velostream.interfaces.IEvent;
 import velostream.stream.StreamDefinition;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.InputMismatchException;
 
 /**
  * StreamAPI - API that allows streams to be created, queried, and removed
@@ -45,70 +41,12 @@ public class StreamAPI {
    * @return
    * @throws StreamNotFoundException
    */
-  public static Stream getStream(String streamname) throws StreamNotFoundException {
+  public static Stream stream(String streamname) throws StreamNotFoundException {
     Stream toreturn = streams.get(streamname);
     if (toreturn != null)
       return toreturn;
     else
       throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
-  }
-
-  /**
-   * Puts an velostream.event into a velostream.stream   with name streamname
-   * Pass true if want willing to block until velostream.event is put successfully into the velostream.stream
-   * Returns true if velostream.event was put succesfully
-   *
-   * @param streamname
-   * @param event
-   * @param block
-   * @return
-   * @throws StreamNotFoundException
-   */
-  public static boolean put(String streamname, IEvent event, boolean block)
-      throws StreamNotFoundException {
-    if (streams.containsKey(streamname)) {
-      return streams.get(streamname).put(event, block);
-    } else
-      throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
-  }
-
-  /**
-   * Puts an velostream.event into a velostream.stream   with name streamname
-   * Blocks until all events are put successfully into the velostream.stream
-   *
-   * @param streamname
-   * @param events
-   * @return
-   * @throws StreamNotFoundException
-   */
-  public static Stream putAll(String streamname, IEvent events[]) throws StreamNotFoundException {
-    if (streams.containsKey(streamname)) {
-      streams.get(streamname).putAll(events);
-      return streams.get(streamname);
-    } else
-      throw new StreamNotFoundException("StreamAPIResource " + streamname + " not found");
-  }
-
-  /**
-   * Remove an velostream.event from the stream
-   *
-   * @param es
-   * @param eventId
-   * @return
-   */
-  public static Stream remove(Stream es, long eventId) {
-    throw new UnsupportedOperationException("remove operation not yet implemented");
-  }
-
-  /**
-   * Remove a list of events from the stream
-   *
-   * @param es
-   * @param eventIds
-   * @return
-   */
-  public static Stream removeAll(Stream es, long[] eventIds) {
-    throw new UnsupportedOperationException("remove all operation not yet implemented");
   }
 
 
@@ -127,7 +65,7 @@ public class StreamAPI {
    * @param queryParams
    * @return
    */
-  public static Object doQuery(String streamname, String queryType, Object... queryParams) {
+  public static Object queryStream(String streamname, String queryType, Object... queryParams) {
 
     Object toreturn = null;
 
@@ -142,55 +80,30 @@ public class StreamAPI {
 
           //ALL
           case 0: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, null);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getAll();
           }
           //LAST
           case 1: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, null);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getLast();
           }
           //FIRST
           case 2: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, null);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getFirst();
           }
           //ALLAFTER
           case 3: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, long.class);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getAllAfter((long) queryParams[0]);
           }
           //ALLBEFORE
           case 4: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, long.class);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getAllBefore((long) queryParams[0]);
           }
           //AVERAGE
           case 5: {
-            Method queryMethod = stream.getEventQueryStore().getQueryOperations().getClass()
-                .getDeclaredMethod("get" + queryType, String.class);
-            toreturn =
-                queryMethod.invoke(stream.getEventQueryStore().getQueryOperations(), queryParams);
-            break;
+            return stream.query().getAverage((String) queryParams[0]);
           }
           case 10: {
-            toreturn = stream.getEventQueryStore().getQueryOperations().getLastBy((String) queryParams[0], queryParams[1]);
-            break;
+            return stream.query().getLastBy((String) queryParams[0], queryParams[1]);
 
           }
           default: {
@@ -198,14 +111,12 @@ public class StreamAPI {
           }
         }
       }
-    } catch (NoSuchMethodException e) {
-
-    } catch (IllegalAccessException e2) {
-
-    } catch (InvocationTargetException e3) {
-
     }
-    return toreturn;
+    catch (Exception e) {
+      throw new InputMismatchException();
+    }
+    return EMPTY_EVENT;
+
   }
 
 }

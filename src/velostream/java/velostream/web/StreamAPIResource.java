@@ -5,6 +5,8 @@ import velostream.stream.StreamDefinition;
 import velostream.event.Event;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import static velostream.StreamAPI.stream;
+import static velostream.StreamAPI.queryStream;
 
 
 @Path("/stream")
@@ -15,7 +17,7 @@ public class StreamAPIResource {
   @Produces("application/json")
   public Object getAll(@PathParam("streamname") String streamname,
       @PathParam("querytype") String querytype) {
-    return StreamAPI.doQuery(streamname, querytype, null);
+    return queryStream(streamname, querytype, null);
   }
 
   @GET
@@ -23,7 +25,7 @@ public class StreamAPIResource {
   @Produces("application/json")
   public Object getAvg(@PathParam("streamname") String streamname,
       @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname) {
-    return StreamAPI.doQuery(streamname, querytype, fieldname);
+    return queryStream(streamname, querytype, fieldname);
   }
 
   @GET
@@ -31,7 +33,7 @@ public class StreamAPIResource {
   @Produces("application/json")
   public Object getQueryBy(@PathParam("streamname") String streamname,
       @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname,  @PathParam("value") String value) {
-    return StreamAPI.doQuery(streamname, querytype, fieldname, value);
+    return queryStream(streamname, querytype, fieldname, value);
   }
 
   @POST
@@ -39,8 +41,7 @@ public class StreamAPIResource {
   @Consumes("application/json")
   public Response postOne(@PathParam("streamname") String streamname, Event event) {
     try {
-      StreamAPI.getStream(streamname);
-      StreamAPI.put(streamname, event, false);
+      stream(streamname).put(event, false);
       return Response.status(201).build();
     } catch (Exception e) {
       throw new BadRequestException(e);

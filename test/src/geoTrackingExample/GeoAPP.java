@@ -38,7 +38,7 @@ public class GeoAPP extends Application {
     setupJourney();
     geoWorker = new GeoEventWorker();
     StreamAPI.newStream(
-        StreamDefinitionBuilder.streamBuilder("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker)
+        StreamDefinitionBuilder.streamDefinition("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker)
             .build());
     geoWorker.setJourney(journey);
   }

@@ -16,7 +16,7 @@ public class StreamOperationsShould {
   public void doSetup() throws Exception {
     Event event;
     quotestream =
-        StreamAPI.newStream(StreamDefinitionBuilder.streamBuilder("quote").setEventTTL(0).build());
+        StreamAPI.newStream(StreamDefinitionBuilder.streamDefinition("quote").setEventTTL(0).build());
 
     event =
         EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
@@ -41,7 +41,7 @@ public class StreamOperationsShould {
 
   @Test
   public void testGetGroupByField() throws Exception {
-    StreamAPI.getStream("quote").getEventQueryStore().getQueryOperations().getEachLastBy("symbol");
+    StreamAPI.stream("quote").query().getEachLastBy("symbol");
 
   }
 }

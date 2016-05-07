@@ -58,7 +58,7 @@ public class QueryStore {
      * Get the query stores query operations
      * @return
      */
-    public QueryOperations getQueryOperations() {
+    protected QueryOperations getQueryOperations() {
         return queryOperations;
     }
 
