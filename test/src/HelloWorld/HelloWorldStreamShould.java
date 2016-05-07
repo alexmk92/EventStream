@@ -18,9 +18,7 @@ public class HelloWorldStreamShould {
     newStream(streamDefinition(HELLO_WORLD).build());
     stream(HELLO_WORLD)
         .put(eventBuilder("MyHelloWorld").addFieldValue("message", "hello world").build(), false);
-    stream(HELLO_WORLD).end();
-    while (!StreamAPI.stream(HELLO_WORLD).isEnd())
-      Thread.currentThread().sleep(1);
+    stream(HELLO_WORLD).end(true);
     Assert.assertThat(stream(HELLO_WORLD).query().getLast().getFieldValue("message"),
         is("hello world"));
   }

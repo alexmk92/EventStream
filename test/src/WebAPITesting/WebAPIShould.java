@@ -5,6 +5,7 @@ import io.undertow.servlet.api.DeploymentInfo;
 import org.jboss.resteasy.test.TestPortProvider;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
 import org.junit.*;
+import static org.junit.Assert.*;
 
 import static org.hamcrest.core.Is.is;
 
@@ -22,8 +23,14 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static velostream.util.EventBuilder.eventBuilder;
+import static velostream.util.StreamDefinitionBuilder.streamDefinition;
+import static velostream.StreamAPI.*;
 
 public class WebAPIShould {
 
@@ -42,21 +49,17 @@ public class WebAPIShould {
     server.deploy(di);
 
 
-    quotestream = StreamAPI.newStream(
-        StreamDefinitionBuilder.streamDefinition("quote")
-            .setEventTTL(1).build());
-    Event event =
-        EventBuilder.eventBuilder("quote").addFieldValue("symbol", "JRD").addFieldValue("price", 20.0D)
-            .build();
+    quotestream = newStream(streamDefinition("quote").setEventTTL(1).build());
+    Event event = eventBuilder("quote").addFieldValue("symbol", "JRD")
+        .addFieldValue("price", 20.0D).build();
     quotestream.put(event, false);
-    Thread.currentThread().sleep(1000);
+    Thread.currentThread().sleep(100);
   }
 
   @Test
   public void getAll() throws Exception {
     Client client = ClientBuilder.newClient();
     try {
-      System.out.println(TestPortProvider.generateURL("/stream/quote/All").toString());
       Event[] eventList = client.target(TestPortProvider.generateURL("/stream/quote/All")).request()
           .get(Event[].class);
 
@@ -88,9 +91,8 @@ public class WebAPIShould {
   public void postOne() throws Exception {
     Client client = ClientBuilder.newClient();
     try {
-      Event event =
-          EventBuilder.eventBuilder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", 2.0D)
-              .build();
+      Event event = eventBuilder("quote").addFieldValue("symbol", "IBM")
+          .addFieldValue("price", 2.0D).build();
       Response response = client.target(TestPortProvider.generateURL("/stream/quote")).request()
           .post(Entity.entity(event, MediaType.APPLICATION_JSON_TYPE));
       response.getStatus();
@@ -98,6 +100,7 @@ public class WebAPIShould {
       client.close();
     }
     this.getAll();
+    this.getAverage();
   }
 
   @Test
@@ -106,9 +109,8 @@ public class WebAPIShould {
     try {
       double n = 2.0;
       for (int i = 0; i < 5000; i++) {
-        Event event =
-            EventBuilder.eventBuilder("quote").addFieldValue("symbol", "IBM").addFieldValue("price", n)
-                .build();
+        Event event = eventBuilder("quote").addFieldValue("symbol", "IBM")
+            .addFieldValue("price", n).build();
         Response response = client.target(TestPortProvider.generateURL("/stream/quote")).request()
             .post(Entity.entity(event, MediaType.APPLICATION_JSON_TYPE));
         response.getStatus();
@@ -119,15 +121,14 @@ public class WebAPIShould {
       client.close();
     }
     this.getAll();
+    this.getAverage();
   }
 
   @Test
   public void createStream() throws Exception {
     //given
 
-    StreamDefinition sd =
-        StreamDefinitionBuilder.streamDefinition("newstream")
-            .setEventTTL(1).build();
+    StreamDefinition sd = streamDefinition("newstream").setEventTTL(1).build();
 
     Client client = ClientBuilder.newClient();
 
@@ -156,7 +157,7 @@ public class WebAPIShould {
     event_fields.put("operator", "?");
     event_fields.put("value", "dispatched");
 
-    StreamDefinition sd = StreamDefinitionBuilder.streamDefinition(ORDER_DELIVERY_STREAM)
+    StreamDefinition sd = streamDefinition(ORDER_DELIVERY_STREAM)
         .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")
         .addEventWorkerParam("value", "dispatched").build();
@@ -173,11 +174,11 @@ public class WebAPIShould {
       response.close();
 
       Event eventInFilter =
-          EventBuilder.eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
+          eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
               .addFieldValue("delivery_status", "dispatched").build();
 
       Event eventNotInFilter =
-          EventBuilder.eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
+          eventBuilder(ORDER_DELIVERY_STREAM).addFieldValue("customer", "123456")
               .addFieldValue("delivery_status", "delivered").build();
 
       response =
@@ -195,10 +196,10 @@ public class WebAPIShould {
       response.close();
 
 
-      String val =
+      Event[] val =
           client.target(TestPortProvider.generateURL("/stream/" + ORDER_DELIVERY_STREAM) + "/All")
-              .request().get(String.class);
-      System.out.println(val);
+              .request().get(Event[].class);
+      assertThat(val[0].getFieldValue("delivery_status"), is("dispatched"));
 
 
     } finally {

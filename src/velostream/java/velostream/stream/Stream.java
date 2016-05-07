@@ -85,8 +85,15 @@ public class Stream {
   /**
    * End the life of this stream :(
    */
-  public void end() {
+  public void end(boolean waitForEnd) {
     this.isEnd = true;
+    if (waitForEnd)
+      while (!this.isEnd())
+        try {
+          Thread.currentThread().sleep(1);
+        } catch (InterruptedException e) {
+        }
+    ;
   }
 
 

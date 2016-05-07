@@ -20,14 +20,16 @@ public class QueryOperations {
   private ConcurrentSkipListSet<IEvent> querystorecontents = null;
   private int eventTTL;
 
+
   private class EventKeyIDEntry {
-      private String key;
-      private Long timestamp;
-      private Long event_id;
-      public EventKeyIDEntry (String key, Long event_id) {
-        this.key=key;
-        this.event_id=event_id;
-      }
+    private String key;
+    private Long timestamp;
+    private Long event_id;
+
+    public EventKeyIDEntry(String key, Long event_id) {
+      this.key = key;
+      this.event_id = event_id;
+    }
   }
 
   public QueryOperations(QueryStore queryStore) {
@@ -73,19 +75,19 @@ public class QueryOperations {
   }
 
   public IEvent getLastBy(String fieldname, Object value) {
-    List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL)).filter(i -> i.getFieldValue(fieldname).equals(value))
-        .collect(Collectors.toList());
-    if (events.size()>0)
-      return events.get(events.size()-1);
+    List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL))
+        .filter(i -> i.getFieldValue(fieldname).equals(value)).collect(Collectors.toList());
+    if (events.size() > 0)
+      return events.get(events.size() - 1);
     else
       return EMPTY_EVENT;
   }
 
   public IEvent[] getEachLastBy(String fieldname) {
 
-     querystorecontents.stream()
-        .collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname), Collectors.maxBy(
-            new EventTimestampComparator()))).forEach((id,event)->Collectors.toList());
+    querystorecontents.stream().collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname),
+        Collectors.maxBy(new EventTimestampComparator())))
+        .forEach((id, event) -> Collectors.toList());
     return null;
 
 
@@ -96,8 +98,12 @@ public class QueryOperations {
   }
 
   public double getAverage(String fieldname) {
-    return this.querystorecontents.stream().parallel().filter(u -> u.isAlive(eventTTL))
-        .mapToDouble(e -> (double) e.getFieldValue(fieldname)).average().getAsDouble();
+    try {
+      return this.querystorecontents.stream().parallel().filter(u -> u.isAlive(eventTTL))
+          .mapToDouble(e -> (double) e.getFieldValue(fieldname)).average().getAsDouble();
+    } catch (NoSuchElementException e) {
+      return 0.0d;
+    }
   }
 
 }

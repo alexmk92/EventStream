@@ -69,8 +69,6 @@ public class StreamAPI {
 
     Object toreturn = null;
 
-    try {
-
       int queryToExecute = Arrays.binarySearch(queryTypes, queryType);
 
       if (streams.containsKey(streamname)) {
@@ -111,10 +109,7 @@ public class StreamAPI {
           }
         }
       }
-    }
-    catch (Exception e) {
-      throw new InputMismatchException();
-    }
+
     return EMPTY_EVENT;
 
   }
