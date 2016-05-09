@@ -83,27 +83,25 @@ public class QueryOperations {
       return EMPTY_EVENT;
   }
 
-  public IEvent[] getEachLastBy(String fieldname) {
-
-    querystorecontents.stream().collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname),
-        Collectors.maxBy(new EventTimestampComparator())))
-        .forEach((id, event) -> Collectors.toList());
-    return null;
-
-
-  }
-
   public IEvent getFirst() {
     return this.querystorecontents.stream().findFirst().filter(u -> u.isAlive(eventTTL)).get();
   }
 
   public double getAverage(String fieldname) {
     try {
-      return this.querystorecontents.stream().parallel().filter(u -> u.isAlive(eventTTL))
+      return this.querystorecontents.stream().parallel().filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
           .mapToDouble(e -> (double) e.getFieldValue(fieldname)).average().getAsDouble();
     } catch (NoSuchElementException e) {
       return 0.0d;
     }
+  }
+
+  public IEvent[] getLastBy(String fieldname) {
+
+    querystorecontents.stream().collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname),
+        Collectors.maxBy(new EventTimestampComparator())))
+        .forEach((id, event) -> Collectors.toList());
+    return null;
   }
 
 }

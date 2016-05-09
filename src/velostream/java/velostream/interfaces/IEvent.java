@@ -35,6 +35,13 @@ public interface IEvent<T> {
      */
     public Object getFieldValue(String name);
 
+    /**
+     * Returns true if the field is present in the event
+     * @return
+     */
+    public boolean hasFieldValue(String fieldname);
+
+
 
 
 }

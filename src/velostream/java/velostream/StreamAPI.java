@@ -98,7 +98,6 @@ public class StreamAPI {
           }
           case LastBy: {
             return stream.query().getLastBy((String) queryParams[0], queryParams[1]);
-
           }
           default: {
             throw new UnsupportedOperationException(queryType.toString());

@@ -55,24 +55,7 @@ public class Event implements IEvent {
     this.eventValues = eventValues;
   }
 
-  public void setEventValues(Map<String, Object> eventValues) {
-    this.eventValues = eventValues;
-  }
-
-  public void setEventID(long eventID) {
-    this.eventID = eventID;
-  }
-
-  public void setTimestamp(long timestamp) {
-    this.timestamp = timestamp;
-  }
-
-  public void addFieldValue(String fieldname, Object value) {
-    if (eventValues.equals(EMPTY_FIELD_VALUES))
-      this.eventValues = new HashMap<>();
-    this.eventValues.put(fieldname, value);
-  }
-
+  @Override
   public Object getFieldValue(String name) {
 
     if (this.eventValues != null) {
@@ -95,16 +78,9 @@ public class Event implements IEvent {
     return toreturn;
   }
 
+  @Override
   public long getTimestamp() {
     return this.timestamp;
-  }
-
-  public String getEventName() {
-    return eventName;
-  }
-
-  public void setEventName(String eventName) {
-    this.eventName = eventName;
   }
 
   @Override
@@ -115,14 +91,50 @@ public class Event implements IEvent {
       return true;
   }
 
+  @Override
+  public boolean hasFieldValue(String fieldname) {
+    if (this.eventValues != null && this.eventValues.containsKey(fieldname))
+      return true;
+    else if (this.getFieldValueViaGetter(fieldname) != null)
+      return true;
+    else
+      return false;
+  }
+
+  @Override
   public long getEventID() {
     return this.eventID;
+  }
+
+  public void setEventValues(Map<String, Object> eventValues) {
+    this.eventValues = eventValues;
+  }
+
+  public void setEventID(long eventID) {
+    this.eventID = eventID;
+  }
+
+  public void setTimestamp(long timestamp) {
+    this.timestamp = timestamp;
+  }
+
+  public void addFieldValue(String fieldname, Object value) {
+    if (eventValues.equals(EMPTY_FIELD_VALUES))
+      this.eventValues = new HashMap<>();
+    this.eventValues.put(fieldname, value);
+  }
+
+  public String getEventName() {
+    return eventName;
+  }
+
+  public void setEventName(String eventName) {
+    this.eventName = eventName;
   }
 
   public Map<String, Object> getEventValues() {
     return eventValues;
   }
-
 
   @Override
   public boolean equals(Object event) {

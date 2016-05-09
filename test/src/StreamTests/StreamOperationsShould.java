@@ -41,7 +41,7 @@ public class StreamOperationsShould {
 
   @Test
   public void testGetGroupByField() throws Exception {
-    StreamAPI.stream("quote").query().getEachLastBy("symbol");
+    StreamAPI.stream("quote").query().getLastBy("symbol");
 
   }
 }
