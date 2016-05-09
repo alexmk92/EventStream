@@ -4,6 +4,8 @@ import velostream.interfaces.IEvent;
 
 public final class EmptyEvent extends Event {
 
+  public static final IEvent EMPTY_EVENT = new EmptyEvent();
+
   public EmptyEvent() {
     setEventName("EMPTY_EVENT");
   }
@@ -13,5 +15,4 @@ public final class EmptyEvent extends Event {
     return false;
   }
 
-  public static final IEvent EMPTY_EVENT = new EmptyEvent();
 }

@@ -7,6 +7,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import static velostream.StreamAPI.stream;
 import static velostream.StreamAPI.queryStream;
+import static velostream.StreamAPI.QueryType;
 
 
 @Path("/stream")
@@ -16,24 +17,24 @@ public class StreamAPIResource {
   @Path("/{streamname}/{querytype}")
   @Produces("application/json")
   public Object getAll(@PathParam("streamname") String streamname,
-      @PathParam("querytype") String querytype) {
-    return queryStream(streamname, querytype, null);
+      @PathParam("querytype") QueryType queryType) {
+    return queryStream(streamname, queryType, null);
   }
 
   @GET
   @Path("/{streamname}/{querytype}/{fieldname}")
   @Produces("application/json")
   public Object getAvg(@PathParam("streamname") String streamname,
-      @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname) {
-    return queryStream(streamname, querytype, fieldname);
+      @PathParam("querytype") QueryType queryType, @PathParam("fieldname") String fieldname) {
+    return queryStream(streamname, queryType, fieldname);
   }
 
   @GET
   @Path("/{streamname}/{querytype}/{fieldname}/{value}")
   @Produces("application/json")
   public Object getQueryBy(@PathParam("streamname") String streamname,
-      @PathParam("querytype") String querytype, @PathParam("fieldname") String fieldname,  @PathParam("value") String value) {
-    return queryStream(streamname, querytype, fieldname, value);
+      @PathParam("querytype") QueryType queryType, @PathParam("fieldname") String fieldname,  @PathParam("value") String value) {
+    return queryStream(streamname, queryType, fieldname, value);
   }
 
   @POST

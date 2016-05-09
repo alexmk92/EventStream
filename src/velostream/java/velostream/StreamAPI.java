@@ -57,6 +57,10 @@ public class StreamAPI {
       new String[] {"All", "Last", "First", "AllAfter", "AllBefore", "Average", "Max", "Min",
           "Count", "Filter", "LastBy"};
 
+  public enum QueryType {
+    All, Last, First, AllAfter, AllBefore, Average, Max, Min, Count, Filter, LastBy, AverageBy, CountBy
+  }
+
   /**
    * Executes the query of type query type on the stream with the given query parameters
    *
@@ -65,47 +69,39 @@ public class StreamAPI {
    * @param queryParams
    * @return
    */
-  public static Object queryStream(String streamname, String queryType, Object... queryParams) {
+  public static Object queryStream(String streamname, QueryType queryType, Object... queryParams) {
 
     Object toreturn = null;
-
-      int queryToExecute = Arrays.binarySearch(queryTypes, queryType);
 
       if (streams.containsKey(streamname)) {
         Stream stream = streams.get(streamname);
 
-        switch (queryToExecute) {
+        switch (queryType) {
 
-          //ALL
-          case 0: {
+          case All: {
             return stream.query().getAll();
           }
-          //LAST
-          case 1: {
+          case Last: {
             return stream.query().getLast();
           }
-          //FIRST
-          case 2: {
+          case First: {
             return stream.query().getFirst();
           }
-          //ALLAFTER
-          case 3: {
+          case AllAfter: {
             return stream.query().getAllAfter((long) queryParams[0]);
           }
-          //ALLBEFORE
-          case 4: {
+          case AllBefore: {
             return stream.query().getAllBefore((long) queryParams[0]);
           }
-          //AVERAGE
-          case 5: {
+          case Average: {
             return stream.query().getAverage((String) queryParams[0]);
           }
-          case 10: {
+          case LastBy: {
             return stream.query().getLastBy((String) queryParams[0], queryParams[1]);
 
           }
           default: {
-            throw new UnsupportedOperationException(queryType);
+            throw new UnsupportedOperationException(queryType.toString());
           }
         }
       }

@@ -2,20 +2,17 @@ package WebAPITesting;
 
 import io.undertow.Undertow;
 import io.undertow.servlet.api.DeploymentInfo;
-import org.jboss.resteasy.test.TestPortProvider;
 import org.jboss.resteasy.plugins.server.undertow.UndertowJaxrsServer;
-import org.junit.*;
-import static org.junit.Assert.*;
-
-import static org.hamcrest.core.Is.is;
-
+import org.jboss.resteasy.test.TestPortProvider;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import velostream.StreamAPI;
 import velostream.event.Event;
-import velostream.util.EventBuilder;
-import velostream.stream.workers.SimpleFilterEventWorker;
-import velostream.stream.StreamDefinition;
 import velostream.stream.Stream;
-import velostream.util.StreamDefinitionBuilder;
+import velostream.stream.StreamDefinition;
+import velostream.stream.workers.SimpleFilterEventWorker;
 import velostream.web.StreamAPIApp;
 
 import javax.ws.rs.client.Client;
@@ -23,14 +20,14 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static velostream.StreamAPI.newStream;
 import static velostream.util.EventBuilder.eventBuilder;
 import static velostream.util.StreamDefinitionBuilder.streamDefinition;
-import static velostream.StreamAPI.*;
 
 public class WebAPIShould {
 
@@ -53,6 +50,7 @@ public class WebAPIShould {
     Event event = eventBuilder("quote").addFieldValue("symbol", "JRD")
         .addFieldValue("price", 20.0D).build();
     quotestream.put(event, false);
+    quotestream.query().getAverage("price");
     Thread.currentThread().sleep(100);
   }
 

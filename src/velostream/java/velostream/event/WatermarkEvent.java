@@ -5,8 +5,13 @@ package velostream.event;
  */
 public class WatermarkEvent extends Event {
 
-      public WatermarkEvent(long eventid, long watermarktimestamp) {
-          super(eventid, watermarktimestamp);
-      }
+  public WatermarkEvent(long eventid, long watermarktimestamp) {
+    super(eventid, watermarktimestamp);
+  }
+
+  @Override
+  public boolean isAlive(int ttl) {
+    return false;
+  }
 
 }
