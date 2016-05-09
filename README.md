@@ -1,7 +1,15 @@
 # EventStream
 # Velostream 2.0
 
-Velostream provides fast stream processing in memory in Java.  Velostream was initially developed in 2004. 
+Velostream provides fast stream processing in memory in Java.  Velostream was initially developed in 2006.
+
+    Stream quotestream = newStream(streamDefinition("quote").setEventTTL(1).build());
+    Event event = eventBuilder("quote").addFieldValue("symbol", "JRD")
+        .addFieldValue("price", 20.0D).build();
+    quotestream.put(event, false);
+    
+    ....
+    quotestream.query().getAverage("price");
 
 This new version of Velostream adds support for Java Lambda and stream processing
 
