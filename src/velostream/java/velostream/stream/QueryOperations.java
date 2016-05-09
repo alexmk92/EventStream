@@ -47,9 +47,7 @@ public class QueryOperations {
   }
 
   public long getCount() {
-    List<IEvent> events = querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL))
-        .collect(Collectors.toList());
-    return events.size();
+    return querystorecontents.parallelStream().filter(u -> u.isAlive(eventTTL)).count();
   }
 
   public IEvent[] getAll() {
@@ -71,7 +69,11 @@ public class QueryOperations {
   }
 
   public IEvent getLast() {
-    return this.querystorecontents.last();
+    IEvent last = this.querystorecontents.last();
+    if (last != null && last.isAlive(eventTTL))
+      return last;
+    else
+      return EMPTY_EVENT;
   }
 
   public IEvent getLastBy(String fieldname, Object value) {
@@ -89,19 +91,55 @@ public class QueryOperations {
 
   public double getAverage(String fieldname) {
     try {
-      return this.querystorecontents.stream().parallel().filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
+      return this.querystorecontents.stream().parallel()
+          .filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
           .mapToDouble(e -> (double) e.getFieldValue(fieldname)).average().getAsDouble();
     } catch (NoSuchElementException e) {
       return 0.0d;
     }
   }
 
-  public IEvent[] getLastBy(String fieldname) {
+  public IEvent getMax(String fieldname) {
+    try {
 
-    querystorecontents.stream().collect(Collectors.groupingBy(foo -> foo.getFieldValue(fieldname),
-        Collectors.maxBy(new EventTimestampComparator())))
-        .forEach((id, event) -> Collectors.toList());
-    return null;
+      IEvent event;
+      event = querystorecontents.stream().parallel()
+          .filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
+          .max(Comparator.comparing(i -> (double) i.getFieldValue(fieldname))).get();
+      return event;
+    } catch (NoSuchElementException e) {
+      return EMPTY_EVENT;
+    }
+  }
+
+  public IEvent getMin(String fieldname) {
+    try {
+      IEvent event;
+      event = querystorecontents.stream().parallel()
+          .filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
+          .min(Comparator.comparing(i -> (double) i.getFieldValue(fieldname))).get();
+      return event;
+    } catch (NoSuchElementException e) {
+      return EMPTY_EVENT;
+    }
+  }
+
+  public double getSum(String fieldname) {
+    try {
+      return this.querystorecontents.stream().parallel()
+          .filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname))
+          .mapToDouble(e -> (double) e.getFieldValue(fieldname)).sum();
+    } catch (NoSuchElementException e) {
+      return 0.0d;
+    }
+  }
+
+  public Set<Map.Entry<Object, Optional<IEvent>>> getLastBy(String fieldname) {
+    return querystorecontents.stream()
+        .filter(u -> u.isAlive(eventTTL) && u.hasFieldValue(fieldname)).collect(Collectors
+            .groupingBy(foo -> foo.getFieldValue(fieldname),
+                Collectors.maxBy(new EventTimestampComparator()))).entrySet();
+
   }
 
 }
