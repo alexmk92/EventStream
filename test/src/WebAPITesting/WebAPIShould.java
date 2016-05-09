@@ -148,13 +148,7 @@ public class WebAPIShould {
   public void doSimpleFilter() throws Exception {
 
     String ORDER_DELIVERY_STREAM = "orderdeliverystream";
-
-    //given
-    Map<String, Object> event_fields = new HashMap<>();
-    event_fields.put("field", "delivery_status");
-    event_fields.put("operator", "?");
-    event_fields.put("value", "dispatched");
-
+    
     StreamDefinition sd = streamDefinition(ORDER_DELIVERY_STREAM)
         .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")

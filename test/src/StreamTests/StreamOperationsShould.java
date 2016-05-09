@@ -87,6 +87,12 @@ public class StreamOperationsShould {
     Assert.assertThat(sum, is(89.0D));
   }
 
+  @Test
+  public void testAverage() throws Exception {
+    double sum = stream("quote").query().getAverage("price");
+    Assert.assertThat(sum, is(22.25D));
+  }
+
 
   @Test
   public void testEmptyStream() throws StreamNotFoundException, InterruptedException {
