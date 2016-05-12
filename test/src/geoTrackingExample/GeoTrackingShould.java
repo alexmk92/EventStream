@@ -72,7 +72,7 @@ public class GeoTrackingShould {
   public void returnONTIMEWhenVehicleCanReachDeliveryGEOOnTime() throws Exception {
     stream("GeoAlert").put(
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
-            .addFieldValue("van_id", 1).addFieldValue("avg_speed", 20.0d).build(), false);
+            .addFieldValue("van_trip_id", 1).addFieldValue("avg_speed", 20.0d).build(), false);
     Thread.currentThread().sleep(200);
     Assert.assertThat(stream("GeoAlert").query()
         .getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.ONTIME));
@@ -83,7 +83,7 @@ public class GeoTrackingShould {
     geoWorker.setAvg_roadspeed_KMH(1);
     stream("GeoAlert").put(
         EventBuilder.eventBuilder("vangeo").addFieldValue("lat", 51.49).addFieldValue("lon", -0.07)
-            .addFieldValue("van_id", 1).addFieldValue("avg_speed", 1.0d).build(), false);
+            .addFieldValue("van_trip_id", 1).addFieldValue("avg_speed", 1.0d).build(), false);
     Thread.currentThread().sleep(200);
     Assert.assertThat(stream("GeoAlert").query()
         .getLastBy("customerId", "Laurence").getFieldValue("status"), is(AlertType.LATE));

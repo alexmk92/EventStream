@@ -13,5 +13,4 @@ public class EventTuple {
         this.event1 = event1;
         this.event2 = event2;
     }
-
 }

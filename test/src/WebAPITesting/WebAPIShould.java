@@ -148,7 +148,7 @@ public class WebAPIShould {
   public void doSimpleFilter() throws Exception {
 
     String ORDER_DELIVERY_STREAM = "orderdeliverystream";
-    
+
     StreamDefinition sd = streamDefinition(ORDER_DELIVERY_STREAM)
         .addEventWorker(new SimpleFilterEventWorker())
         .addEventWorkerParam("field", "delivery_status").addEventWorkerParam("operator", "?")

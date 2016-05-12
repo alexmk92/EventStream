@@ -99,8 +99,8 @@ public class GeoEventWorker implements IEventWorker {
 
   public List<IEvent> work(IEvent eventIn, Map<String, Object> params) {
     ArrayList<IEvent> alerts = new ArrayList<>();
-    van_lat = (double) eventIn.getFieldValue("lat");
-    van_lon = (double) eventIn.getFieldValue("lon");
+    van_lat = (double) eventIn.getFieldValue("van_lat");
+    van_lon = (double) eventIn.getFieldValue("Van_lon");
     avg_roadspeed_KMH = (double) eventIn.getFieldValue("avg_speed");
 
     ArrayList<Stop> stops_remaining = getStopsForNextHour(getCurrentTimeInMillisecconds());

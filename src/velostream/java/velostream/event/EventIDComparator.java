@@ -16,5 +16,4 @@ public class EventIDComparator implements Comparator<IEvent> {
         else if (o1.getEventID() < o2.getEventID()) return -1;
         else return -1;
     }
-
 }

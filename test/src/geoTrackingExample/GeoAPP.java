@@ -11,9 +11,11 @@ import velostream.stream.Stream;
 import velostream.util.StreamDefinitionBuilder;
 import velostream.web.StreamAPIApp;
 import velostream.web.StreamAPIResource;
+import static geoTrackingExample.microlise.MicroliseAPIAdapter.*;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
+import javax.xml.soap.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +28,10 @@ public class GeoAPP extends Application {
   private static Stream quotestream;
   private static GeoEventWorker geoWorker;
 
+  private static String userName;
+  private static String password;
+  private static String serviceURI;
+
   @Override
   public Set<Class<?>> getClasses() {
     HashSet<Class<?>> classes = new HashSet<Class<?>>();
@@ -33,14 +39,19 @@ public class GeoAPP extends Application {
     return classes;
   }
 
-  public static void setup() {
 
+  private static SOAPMessage callDotcomDeliveryStatusSOAPRequest() throws Exception {
+    return null;
+  }
+
+  public static void setup() {
     setupJourney();
     geoWorker = new GeoEventWorker();
-    StreamAPI.newStream(
-        StreamDefinitionBuilder.streamDefinition("GeoAlert").setEventTTL(60*60).addEventWorker(geoWorker)
-            .build());
+    StreamAPI.newStream(StreamDefinitionBuilder.streamDefinition("GeoAlert").setEventTTL(60 * 60)
+        .addEventWorker(geoWorker).build());
     geoWorker.setJourney(journey);
+    Object result = callMicrolise(serviceURI, EndPoint.GetTripStatus, userName,password);
+    return;
   }
 
   public static void setupJourney() {
@@ -63,6 +74,11 @@ public class GeoAPP extends Application {
   }
 
   public static void main(String args[]) throws Exception {
+    if (args.length >= 3 && !args[0].isEmpty() && !args[1].isEmpty() && !args[2].isEmpty()) {
+      userName = args[0];
+      password = args[1];
+      serviceURI= args[2];
+    }
     Undertow.Builder serverBuilder = Undertow.builder().addHttpListener(8081, "127.0.0.1");
     server = new UndertowJaxrsServer().start(serverBuilder);
     DeploymentInfo di = server.undertowDeployment(StreamAPIApp.class);
@@ -70,7 +86,7 @@ public class GeoAPP extends Application {
     di.setDeploymentName("velostream");
     server.deploy(di);
     setup();
-    Thread.currentThread().sleep(1000*60*3);
+    Thread.currentThread().sleep(1000 * 60 * 3);
   }
 }
 
